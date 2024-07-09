@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\TaskStatusEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,7 +20,7 @@ class TaskFactory extends Factory
         return [
             'title' => fake()->text(50),
             'description' => fake()->text(200),
-            'status' => fake()->randomElement([-1,0,1]),
+            'status' => fake()->randomElement(TaskStatusEnum::cases()),
             'created_at' => fake()->dateTimeBetween(startDate: '-1 year')
         ];
     }

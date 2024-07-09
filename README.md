@@ -61,4 +61,92 @@ STATUS: 401 (Unauthorized)
 }
 </pre>
 
-- DELETE./api/token
+## LIST TASKS
+### Request
+<pre>
+curl --request GET \
+  --url ./api/tasks \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json'
+</pre>
+### Response
+<pre>
+STATUS: 200
+{
+    "data": [
+        {
+            "title": STRING
+            "description": STRING
+            "status": "to_do"|"in_progress"|"done"
+            "created_at": DATETIME
+            "updated_at": DATETIME
+        },
+        ...
+    ]
+}
+</pre>
+
+## CREATE TASK
+### Request
+<pre>
+curl --request POST \
+  --url ./api/tasks\
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --data '{
+        "title": STRING
+        "description": STRING
+        "status": "to_do"|"in_progress"|"done"
+}'
+</pre>
+
+## SHOW SINGLE TASK
+### Request
+<pre>
+curl --request GET \
+  --url ./api/tasks/__TASK_UUID__ \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json'
+</pre>
+### Response
+<pre>
+STATUS: 200
+{
+    "data": 
+        {
+            "title": STRING
+            "description": STRING
+            "status": "to_do"|"in_progress"|"done"
+            "created_at": DATETIME
+            "updated_at": DATETIME
+        }
+}
+</pre>
+
+## UPDATE TASK
+### Request
+<pre>
+curl --request PATCH \
+  --url ./api/tasks/__TASK_UUID__ \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --data '{
+        "title": STRING
+        "description": STRING
+        "status": "to_do"|"in_progress"|"done"
+    }'
+</pre>
+
+## DELETE TASK
+### Request
+<pre>
+curl --request DELETE \
+  --url ./api/tasks/__TASK_UUID__ \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' 
+</pre>
