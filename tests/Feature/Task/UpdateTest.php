@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Task;
 
+use App\Enums\TaskStatusEnum;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -28,7 +29,7 @@ class UpdateTest extends TaskTestsAbstract
         $newData = [
             'title' => 'My new title',
             'description' => 'My new description',
-            'status' => '99'
+            'status' => TaskStatusEnum::IN_PROGRESS->value
         ];
 
         $response = $this->updateTask($task, $newData);
@@ -63,7 +64,7 @@ class UpdateTest extends TaskTestsAbstract
         $newData = [
             'title' => 'My new title',
             'description' => 'My new description',
-            'status' => '99'
+            'status' => TaskStatusEnum::IN_PROGRESS->value
         ];
 
         $response =  $this->patchJson('/api/tasks/'.$task->id, $newData);
@@ -78,6 +79,40 @@ class UpdateTest extends TaskTestsAbstract
         $this->assertEquals($task->description, $updatedTask->description);
         $this->assertEquals($task->status, $updatedTask->status);
 
+    }
+
+    /**
+     * Testing than an authenticate user cannot update a task with a title longer than 255 chars
+     * - HTTP Status should be 422
+     * - Response should include a corresponding error message telling about the error in the title field validation
+     * @return void
+     */
+    public function test_couldNotUpdateTaskWithATitleLongerThan255Chars()
+    {
+
+        // load a task for an update
+        $task = Task::all()->first();
+
+        // create an random example text with min 256 chars
+        $strLength = 256;
+        $exampleText = fake()->text();
+        while (($currentStrLength = strlen($exampleText)) < $strLength)
+        {
+            $exampleText .= fake()->text();
+        }
+        // test for char length
+        $this->assertTrue(strlen($exampleText) >= $strLength);
+        $newData = [
+            'title' => $exampleText
+        ];
+
+        $response = $this->updateTask($task, $newData);
+
+        $response
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonPath('errors.title', fn(mixed $value) => is_array($value))
+            ->assertJsonPath('errors.title.0',  'The title field must not be greater than 255 characters.')
+        ;
     }
 
     /**
@@ -139,8 +174,9 @@ class UpdateTest extends TaskTestsAbstract
     {
         // load a task for an update
         $task = Task::all()->first();
-        $newData = [ 'status' => '99'];
+        $newData = [ 'status' => TaskStatusEnum::IN_PROGRESS->value];
         $response = $this->updateTask($task, $newData);
+
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data.title', $task->title)
             ->assertJsonPath('data.description', $task->description)
@@ -149,8 +185,8 @@ class UpdateTest extends TaskTestsAbstract
         // reload Task from DB
         $updatedTask = Task::find($task)->first();
         $this->assertEquals($newData['status'], $updatedTask->status);
-
     }
+
 
     /**
      * Testing an authenticated user can not update a field with an empty string
@@ -193,6 +229,28 @@ class UpdateTest extends TaskTestsAbstract
         // reload Task from DB
         $updatedTask = Task::find($task)->first();
         $this->assertNotEquals($newData['description'], $updatedTask->description);
+    }
+
+    /**
+     * Testing that an authenticated user cannot update a task with a wrong status
+     * - HTTP Status should be 422
+     * - Response should include a corresponding error message telling about the error in the title field validation
+     *
+     * @return void
+     */
+    public function test_couldNotUpdateStatusFromTaskWithWrongValue()
+    {
+        // load a task for an update
+        $task = Task::all()->first();
+        $newData = [ 'status' => 'Wrong Status Value'];
+        $response = $this->updateTask($task, $newData);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonPath('errors.status', fn(mixed $value) => is_array($value))
+            ->assertJsonPath('errors.status.0',  'The selected status is invalid.')
+        ;
+        // reload Task from DB
+        $updatedTask = Task::find($task)->first();
+        $this->assertNotEquals($newData['status'], $task->status);
     }
 
     /**

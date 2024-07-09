@@ -2,12 +2,14 @@
 
 namespace Tests\Feature\Task;
 
+use App\Enums\TaskStatusEnum;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Response;
 use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
+use Psy\Util\Str;
 use Tests\TestCase;
 
 class CreateTaskTest extends TaskTestsAbstract
@@ -25,10 +27,11 @@ class CreateTaskTest extends TaskTestsAbstract
         $data = [
             'title' => 'my task',
             'description' => 'my task description',
-            'status' => 'my status'
+            'status' => TaskStatusEnum::TODO->value,
         ];
 
         $response = $this->createTask($data);
+
 
         $response->assertStatus(Response::HTTP_CREATED)
             ->assertJsonPath('success', true)
@@ -50,7 +53,7 @@ class CreateTaskTest extends TaskTestsAbstract
         $data = [
             'title' => 'my task',
             'description' => 'my task description',
-            'status' => 'my status'
+            'status' => TaskStatusEnum::TODO->value
         ];
 
         $response = $this->postJson('/api/tasks/', $data);
@@ -59,6 +62,64 @@ class CreateTaskTest extends TaskTestsAbstract
             ->assertJsonPath('message', 'Unauthenticated.')
         ;
 
+    }
+
+    /**
+     * Testing than an authenticate user cannot create a task with a title longer than 255 chars
+     * - HTTP Status should be 422
+     * - Response should include a corresponding error message telling about the error in the title field validation
+     * @return void
+     */
+    public function test_couldNotCreateTaskWithATitleLongerThan255Chars()
+    {
+
+        // create an random example text with min 256 chars
+        $strLength = 256;
+        $exampleText = fake()->text();
+        while (($currentStrLength = strlen($exampleText)) < $strLength)
+        {
+            $exampleText .= fake()->text();
+        }
+
+        // test for char length
+        $this->assertTrue(strlen($exampleText) >= $strLength);
+        $data = [
+            'title' => $exampleText,
+            'description' => 'my task description',
+            'status' => 'done'
+        ];
+
+        $response = $this->createTask($data);
+
+        $response
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonPath('errors.title', fn(mixed $value) => is_array($value))
+            ->assertJsonPath('errors.title.0',  'The title field must not be greater than 255 characters.')
+        ;
+    }
+
+    /**
+     * Testing that an authenticated user cannot create a task with a wrong status
+     * - HTTP Status should be 422
+     * - Response should include a corresponding error message telling about the error in the title field validation
+     *
+     * @return void
+     */
+    public function test_couldNotCreateTaskWithWrongStatus()
+    {
+        $data = [
+            'title' => 'My task title',
+            'description' => 'my task description',
+            'status' => 'this is a wrong status'
+        ];
+
+        $response = $this->createTask($data);
+
+        $response
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonPath('errors.status', fn(mixed $value) => is_array($value))
+            ->assertJsonPath('errors.status.0',  'The selected status is invalid.')
+        ;
     }
 
     /**
@@ -73,7 +134,7 @@ class CreateTaskTest extends TaskTestsAbstract
         $data = [
             'title' => '',
             'description' => 'my task description',
-            'status' => 'my status'
+            'status' => 'done'
         ];
         $response = $this->createTask($data);
         $response
@@ -94,7 +155,7 @@ class CreateTaskTest extends TaskTestsAbstract
         $data = [
             'title' => 'my title',
             'description' => '',
-            'status' => 'my status'
+            'status' => 'done'
         ];
         $response = $this->createTask($data);
         $response
