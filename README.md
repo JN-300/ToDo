@@ -1,66 +1,235 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Installation
+Best way to install a test version of this application is to use ddev.
+See https://ddev.readthedocs.io/en/stable/ for  installation instructions of ddev.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A little bit more about the advantages of development with ddev instead of a plain docker setup will hopefully come later.
 
-## About Laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Using ddev
+.. more will be come later
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+# API Routes
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## CREATE TOKEN (Login)
 
-## Learning Laravel
+### Request
+<pre>
+curl --request POST \
+  --url ./api/token \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --data '{
+	"email": __EMAIL__,
+	"password": __PASSWORD__
+}'
+</pre>
+### Response
+// success
+<pre>
+STATUS: 200
+{
+    'access_token': __ACCESSS_TOKEN
+}
+</pre>
+// failure
+<pre>
+STATUS: 422
+{
+	"message": "auth.failed",
+	"errors": {
+		"email": [
+			"auth.failed"
+		]
+	}
+}
+</pre>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## DELETE TOKEN (Logout)
+### Request
+<pre>
+curl --request DELETE \
+  --url ./api/token \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'accept: Application/json' \
+  --header 'Content-Type: application/json' \
+</pre>
+### Response
+// success
+<pre>
+STATUS: 200
+{
+	"success": true,
+	"message": "token deleted"
+}
+</pre>
+// failure
+<pre>
+STATUS: 401 (Unauthorized)
+{
+	"message": "unauthenticated"
+}
+</pre>
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## LIST TASKS
+### Request
+<pre>
+curl --request GET \
+  --url ./api/tasks \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json'
+</pre>
+### Response
+<pre>
+STATUS: 200
+{
+    "data": [
+        {
+            "title": STRING
+            "description": STRING
+            "status": "to_do"|"in_progress"|"done"
+            "created_at": DATETIME
+            "updated_at": DATETIME
+        },
+        ...
+    ]
+}
+</pre>
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## CREATE TASK
+### Request
+<pre>
+curl --request POST \
+  --url ./api/tasks\
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --data '{
+        "title": STRING
+        "description": STRING
+        "status": "to_do"|"in_progress"|"done"
+}'
+</pre>
+### Response
+<pre>
+STATUS: 201
+{
+	"data": {
+		"id": __TASK_UUID__,
+		"title": STRING,
+		"description": STRING,
+		"status": STRING "to_do"|"in_progress"|"done",
+		"created_at": DATETIME,
+		"updated_at": DATETIME
+	},
+	"success": true,
+	"message": "Task successfully generated"
+}
+</pre>
 
-## Laravel Sponsors
+## SHOW SINGLE TASK
+### Request
+<pre>
+curl --request GET \
+  --url ./api/tasks/__TASK_UUID__ \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json'
+</pre>
+### Response
+// success
+<pre>
+STATUS: 200
+{
+    "data": 
+        {
+            "id": UUID __TASK_UUID__,
+            "title": STRING
+            "description": STRING
+            "status": "to_do"|"in_progress"|"done"
+            "created_at": DATETIME
+            "updated_at": DATETIME
+        }
+}
+</pre>
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+// failure
+<pre>
+STATUS: 422
+{
+	"message": STRING __ERROR_MESSAGE__,
+	"errors": {...}
+}
 
-### Premium Partners
+</pre>
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## UPDATE TASK
+### Request
+<pre>
+curl --request PATCH \
+  --url ./api/tasks/__TASK_UUID__ \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --data '{
+        "title": STRING
+        "description": STRING
+        "status": "to_do"|"in_progress"|"done"
+    }'
+</pre>
+### Response
+// success
+<pre>
+STATUS: 200
+{
+	"data": {
+		"id": __TASK_UUID__,
+		"title": STRING,
+		"description": STRING,
+		"status": STRING "to_do"|"in_progress"|"done",
+		"created_at": DATETIME,
+		"updated_at": DATETIME
+	},
+	"success": true,
+	"message": "Task successfully updated"
+}
+</pre>
+// failure
+<pre>
+STATUS: 422
+{
+	"message": STRING __ERROR_MESSAGE__,
+	"errors": {...}
+}
 
-## Contributing
+</pre>
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## DELETE TASK
+### Request
+<pre>
+curl --request DELETE \
+  --url ./api/tasks/__TASK_UUID__ \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' 
+</pre>
 
-## Code of Conduct
+### Response
+// success
+<pre>
+STATUS: 200
+{
+	"success": true,
+	"message": "Task successfully deleted"
+}
+</pre>
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+// failure
+<pre>
+STATUS: 422
+{
+	"message": STRING __ERROR_MESSAGE__,
+	"errors": {...}
+}
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+</pre>
