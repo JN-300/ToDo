@@ -17,7 +17,15 @@ Route::name('token.' )
     });
 
 
+Route::middleware('auth:sanctum')
+    ->group(function () {
+        Route::apiResource('tasks', \App\Http\Controllers\TaskController::class);
+        Route::get('/user', function (Request $request) {
+            return response()->json($request->user());
+        });
+    });
 
-Route::get('/user', function (Request $request) {
-    return response()->json($request->user());
-})->middleware('auth:sanctum');
+//
+//Route::get('/user', function (Request $request) {
+//    return response()->json($request->user());
+//})->middleware('auth:sanctum');
