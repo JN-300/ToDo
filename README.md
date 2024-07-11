@@ -8,12 +8,33 @@ A little bit more about the advantages of development with ddev instead of a pla
 ## Using ddev
 .. more will be come later
 
+```console
+:$ cd __DEVELOPMENT_FOLDER
+## either
+$ git clone https://github.com/JN-300/ToDo.git
+$ cd ToDo
+## or
+$ mkdir __REQUESTED_FOLDER__
+$ cd __REQUESTED_FOLDER__
+$ git clone https://github.com/JN-300/ToDo.git .
+## \or
+
+$ ddev start
+$ ddev composer install
+$ ddev artisan key:generate
+$ ddev artisan migrate [--seed für Beispielnutzer und Testdatensätze]
+```
+## Testing
+```console
+$ ddev artisan test
+```
+
 # API Routes
 
 ## CREATE TOKEN (Login)
 
 ### Request
-<pre>
+```console
 curl --request POST \
   --url ./api/token \
   --header 'Accept: application/json' \
@@ -21,19 +42,20 @@ curl --request POST \
   --data '{
 	"email": __EMAIL__,
 	"password": __PASSWORD__
-}'
-</pre>
+}
+```
 ### Response
 // success
-<pre>
-STATUS: 200
+```console
+# STATUS: 200
 {
     'access_token': __ACCESSS_TOKEN
 }
-</pre>
+```
 // failure
-<pre>
-STATUS: 422
+
+```console
+# STATUS: 422
 {
 	"message": "auth.failed",
 	"errors": {
@@ -42,29 +64,28 @@ STATUS: 422
 		]
 	}
 }
-</pre>
+```
 
 ## DELETE TOKEN (Logout)
 ### Request
-<pre>
+```console
 curl --request DELETE \
   --url ./api/token \
   --header 'Authorization: Bearer __ACCESS_TOKEN__' \
   --header 'accept: Application/json' \
   --header 'Content-Type: application/json' \
-</pre>
+```
+
 ### Response
 // success
-<pre>
-STATUS: 200
+```consoleSTATUS: 200
 {
 	"success": true,
 	"message": "token deleted"
 }
 </pre>
 // failure
-<pre>
-STATUS: 401 (Unauthorized)
+```consoleSTATUS: 401 (Unauthorized)
 {
 	"message": "unauthenticated"
 }
@@ -72,16 +93,17 @@ STATUS: 401 (Unauthorized)
 
 ## LIST TASKS
 ### Request
-<pre>
+```console
 curl --request GET \
   --url ./api/tasks \
   --header 'Authorization: Bearer __ACCESS_TOKEN__' \
   --header 'Accept: application/json' \
   --header 'Content-Type: application/json'
-</pre>
+```
+
 ### Response
-<pre>
-STATUS: 200
+```console
+# STATUS: 200
 {
     "data": [
         {
@@ -94,11 +116,11 @@ STATUS: 200
         ...
     ]
 }
-</pre>
+```
 
 ## CREATE TASK
 ### Request
-<pre>
+```console
 curl --request POST \
   --url ./api/tasks\
   --header 'Authorization: Bearer __ACCESS_TOKEN__' \
@@ -109,10 +131,9 @@ curl --request POST \
         "description": STRING
         "status": "to_do"|"in_progress"|"done"
 }'
-</pre>
+```
 ### Response
-<pre>
-STATUS: 201
+```consoleSTATUS: 201
 {
 	"data": {
 		"id": __TASK_UUID__,
@@ -125,21 +146,20 @@ STATUS: 201
 	"success": true,
 	"message": "Task successfully generated"
 }
-</pre>
+```
 
 ## SHOW SINGLE TASK
 ### Request
-<pre>
+```console
 curl --request GET \
   --url ./api/tasks/__TASK_UUID__ \
   --header 'Authorization: Bearer __ACCESS_TOKEN__' \
   --header 'Accept: application/json' \
   --header 'Content-Type: application/json'
-</pre>
+```
 ### Response
 // success
-<pre>
-STATUS: 200
+```consoleSTATUS: 200
 {
     "data": 
         {
@@ -151,21 +171,20 @@ STATUS: 200
             "updated_at": DATETIME
         }
 }
-</pre>
+```
 
 // failure
-<pre>
+```console
 STATUS: 422
 {
 	"message": STRING __ERROR_MESSAGE__,
 	"errors": {...}
 }
-
-</pre>
+```
 
 ## UPDATE TASK
 ### Request
-<pre>
+```console
 curl --request PATCH \
   --url ./api/tasks/__TASK_UUID__ \
   --header 'Authorization: Bearer __ACCESS_TOKEN__' \
@@ -176,11 +195,10 @@ curl --request PATCH \
         "description": STRING
         "status": "to_do"|"in_progress"|"done"
     }'
-</pre>
+```
 ### Response
 // success
-<pre>
-STATUS: 200
+```consoleSTATUS: 200
 {
 	"data": {
 		"id": __TASK_UUID__,
@@ -193,43 +211,41 @@ STATUS: 200
 	"success": true,
 	"message": "Task successfully updated"
 }
-</pre>
+```
 // failure
-<pre>
-STATUS: 422
+```consoleSTATUS: 422
 {
 	"message": STRING __ERROR_MESSAGE__,
 	"errors": {...}
 }
-
-</pre>
+```
 
 ## DELETE TASK
 ### Request
-<pre>
+```console
 curl --request DELETE \
   --url ./api/tasks/__TASK_UUID__ \
   --header 'Authorization: Bearer __ACCESS_TOKEN__' \
   --header 'Accept: application/json' \
   --header 'Content-Type: application/json' 
-</pre>
+```
 
 ### Response
 // success
-<pre>
+```console
 STATUS: 200
 {
 	"success": true,
 	"message": "Task successfully deleted"
 }
-</pre>
+```
 
 // failure
-<pre>
+```console
 STATUS: 422
 {
 	"message": STRING __ERROR_MESSAGE__,
 	"errors": {...}
 }
 
-</pre>
+```
