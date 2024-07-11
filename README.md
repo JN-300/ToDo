@@ -208,7 +208,8 @@ curl --request PATCH \
 ### Response
 
 // success
-```consoleSTATUS: 200
+```console
+# STATUS: 200
 {
 	"data": {
 		"id": __TASK_UUID__,
