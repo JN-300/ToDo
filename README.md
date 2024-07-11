@@ -6,7 +6,7 @@ A little bit more about the advantages of development with ddev instead of a pla
 
 
 ## Using ddev
-.. more will be come later
+... more will be come later
 
 ```console
 :$ cd __DEVELOPMENT_FOLDER
@@ -44,6 +44,7 @@ curl --request POST \
 	"password": __PASSWORD__
 }
 ```
+
 ### Response
 // success
 ```console
@@ -52,8 +53,8 @@ curl --request POST \
     'access_token': __ACCESSS_TOKEN
 }
 ```
-// failure
 
+// failure
 ```console
 # STATUS: 422
 {
@@ -67,6 +68,7 @@ curl --request POST \
 ```
 
 ## DELETE TOKEN (Logout)
+
 ### Request
 ```console
 curl --request DELETE \
@@ -78,18 +80,21 @@ curl --request DELETE \
 
 ### Response
 // success
-```consoleSTATUS: 200
+```console
+# STATUS: 200
 {
 	"success": true,
 	"message": "token deleted"
 }
-</pre>
+```
+
 // failure
-```consoleSTATUS: 401 (Unauthorized)
+```console
+# STATUS: 401 (Unauthorized)
 {
 	"message": "unauthenticated"
 }
-</pre>
+```
 
 ## LIST TASKS
 ### Request
@@ -133,7 +138,8 @@ curl --request POST \
 }'
 ```
 ### Response
-```consoleSTATUS: 201
+```console
+# STATUS: 201
 {
 	"data": {
 		"id": __TASK_UUID__,
@@ -159,7 +165,8 @@ curl --request GET \
 ```
 ### Response
 // success
-```consoleSTATUS: 200
+```console
+# STATUS: 200
 {
     "data": 
         {
@@ -175,7 +182,7 @@ curl --request GET \
 
 // failure
 ```console
-STATUS: 422
+# STATUS: 422
 {
 	"message": STRING __ERROR_MESSAGE__,
 	"errors": {...}
@@ -183,6 +190,7 @@ STATUS: 422
 ```
 
 ## UPDATE TASK
+
 ### Request
 ```console
 curl --request PATCH \
@@ -196,7 +204,9 @@ curl --request PATCH \
         "status": "to_do"|"in_progress"|"done"
     }'
 ```
+
 ### Response
+
 // success
 ```consoleSTATUS: 200
 {
@@ -212,8 +222,10 @@ curl --request PATCH \
 	"message": "Task successfully updated"
 }
 ```
+
 // failure
-```consoleSTATUS: 422
+```console
+# STATUS: 422
 {
 	"message": STRING __ERROR_MESSAGE__,
 	"errors": {...}
@@ -231,9 +243,10 @@ curl --request DELETE \
 ```
 
 ### Response
+
 // success
 ```console
-STATUS: 200
+# STATUS: 200
 {
 	"success": true,
 	"message": "Task successfully deleted"
@@ -242,7 +255,7 @@ STATUS: 200
 
 // failure
 ```console
-STATUS: 422
+# STATUS: 422
 {
 	"message": STRING __ERROR_MESSAGE__,
 	"errors": {...}
