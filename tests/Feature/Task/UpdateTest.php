@@ -59,7 +59,11 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_couldNotUpdateTaskAsUnauthenticatedUser(): void
     {
-        $task = Task::factory()->create();
+        $task = Task::factory()->create(
+            [
+                'status' => TaskStatusEnum::TODO
+            ]
+        );
 
         $newData = [
             'title' => 'My new title',
@@ -74,10 +78,11 @@ class UpdateTest extends TaskTestsAbstract
         ;
         // reload Task from DB
         $updatedTask = Task::find($task)->first();
+
         // check if model is not modified
         $this->assertEquals($task->title, $updatedTask->title);
         $this->assertEquals($task->description, $updatedTask->description);
-        $this->assertEquals($task->status, $updatedTask->status);
+        $this->assertEquals($task->status->value, $updatedTask->status);
 
     }
 
@@ -94,14 +99,18 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_updateOnlyTitleFromTask(): void
     {
-        $task       = Task::factory()->create();
+        $task       = Task::factory()->create(
+            [
+                'status' => TaskStatusEnum::TODO
+            ]
+        );
         $newData    = ['title' => 'My new title'];
 
         $response = $this->updateTask($task, $newData);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data.title', $newData['title'])
             ->assertJsonPath('data.description', $task->description)
-            ->assertJsonPath('data.status', $task->status)
+            ->assertJsonPath('data.status', $task->status->value)
         ;
         // reload Task from DB
         $updatedTask = Task::find($task)->first();
@@ -117,7 +126,11 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_couldNotUpdateTaskWithATitleLongerThan255Chars()
     {
-        $task = Task::factory()->create();
+        $task       = Task::factory()->create(
+            [
+                'status' => TaskStatusEnum::TODO
+            ]
+        );
 
         // create a random example text with min 256 chars
         $strLength = 256;
@@ -150,7 +163,11 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_couldNotUpdateTaskWithEmptyTitle(): void
     {
-        $task       = Task::factory()->create();
+        $task       = Task::factory()->create(
+            [
+                'status' => TaskStatusEnum::TODO
+            ]
+        );
         $newData    = ['title' => ''];
 
         $response = $this->updateTask($task, $newData);
@@ -173,14 +190,18 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_updateOnlyDescriptionFromTask(): void
     {
-        $task       = Task::factory()->create();
+        $task       = Task::factory()->create(
+            [
+                'status' => TaskStatusEnum::TODO
+            ]
+        );
         $newData    = ['description' => 'My new description'];
 
         $response = $this->updateTask($task, $newData);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data.title', $task->title)
             ->assertJsonPath('data.description', $newData['description'])
-            ->assertJsonPath('data.status', $task->status)
+            ->assertJsonPath('data.status', $task->status->value)
         ;
         // reload Task from DB
         $updatedTask = Task::find($task)->first();
@@ -197,7 +218,11 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_couldNotUpdateTaskWithEmptyDescription(): void
     {
-        $task       = Task::factory()->create();
+        $task       = Task::factory()->create(
+            [
+                'status' => TaskStatusEnum::TODO
+            ]
+        );
         $newData    = ['description' => ''];
 
         $response = $this->updateTask($task, $newData);
@@ -221,7 +246,11 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_updateOnlyStatusFromTask(): void
     {
-        $task       = Task::factory()->create();
+        $task       = Task::factory()->create(
+            [
+                'status' => TaskStatusEnum::TODO
+            ]
+        );
         $newData    = [ 'status' => TaskStatusEnum::IN_PROGRESS->value];
         $response   = $this->updateTask($task, $newData);
 
@@ -244,7 +273,11 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_couldNotUpdateStatusFromTaskWithWrongValue()
     {
-        $task       = Task::factory()->create();
+        $task       = Task::factory()->create(
+            [
+                'status' => TaskStatusEnum::TODO
+            ]
+        );
         $newData    = [ 'status' => 'Wrong Status Value'];
         $response   = $this->updateTask($task, $newData);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
@@ -266,7 +299,7 @@ class UpdateTest extends TaskTestsAbstract
     {
         $task = Task::factory()
             ->create([
-                'deadline' => Carbon::now()->modify('+ 30minutes')
+                'status' => TaskStatusEnum::TODO
             ]);
         $newData = [ 'status' => ''];
         $response = $this->updateTask($task, $newData);
@@ -290,7 +323,11 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_updateDeadlineOfTask(): void
     {
-        $task = Task::factory()->create();
+        $task       = Task::factory()->create(
+            [
+                'status' => TaskStatusEnum::TODO
+            ]
+        );
         $newData = [
             'deadline' => $task->deadline
                 ->modify('+30 days')
@@ -319,6 +356,7 @@ class UpdateTest extends TaskTestsAbstract
 
         $task = Task::factory()
             ->create([
+                'status' => TaskStatusEnum::TODO,
                 'deadline' => Carbon::now()->modify('+5 days')
             ]);
 
