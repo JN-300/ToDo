@@ -5,6 +5,7 @@ namespace Tests\Feature\Task;
 use App\Enums\TaskStatusEnum;
 use App\Models\Task;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Response;
@@ -23,8 +24,8 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_updateTask(): void
     {
-        // load a task for an update
-        $task = Task::all()->first();
+
+        $task = Task::factory()->create();
 
         $newData = [
             'title' => 'My new title',
@@ -58,8 +59,7 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_couldNotUpdateTaskAsUnauthenticatedUser(): void
     {
-        // load a task for an update
-        $task = Task::all()->first();
+        $task = Task::factory()->create();
 
         $newData = [
             'title' => 'My new title',
@@ -81,6 +81,34 @@ class UpdateTest extends TaskTestsAbstract
 
     }
 
+
+    /** ----- SINGLE FIELD UPDATES -----  */
+
+    /** ------ TITLE FIELD VALIDATIONS -------------- */
+
+    /**
+     * Testing an authenticated user can only change one field
+     * - HTTP Status should be 200
+     *
+     * @return void
+     */
+    public function test_updateOnlyTitleFromTask(): void
+    {
+        $task       = Task::factory()->create();
+        $newData    = ['title' => 'My new title'];
+
+        $response = $this->updateTask($task, $newData);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonPath('data.title', $newData['title'])
+            ->assertJsonPath('data.description', $task->description)
+            ->assertJsonPath('data.status', $task->status)
+        ;
+        // reload Task from DB
+        $updatedTask = Task::find($task)->first();
+        $this->assertEquals($newData['title'], $updatedTask->title);
+
+    }
+
     /**
      * Testing than an authenticate user cannot update a task with a title longer than 255 chars
      * - HTTP Status should be 422
@@ -89,11 +117,9 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_couldNotUpdateTaskWithATitleLongerThan255Chars()
     {
+        $task = Task::factory()->create();
 
-        // load a task for an update
-        $task = Task::all()->first();
-
-        // create an random example text with min 256 chars
+        // create a random example text with min 256 chars
         $strLength = 256;
         $exampleText = fake()->text();
         while (($currentStrLength = strlen($exampleText)) < $strLength)
@@ -115,30 +141,29 @@ class UpdateTest extends TaskTestsAbstract
         ;
     }
 
+
     /**
-     * Testing an authenticated user can only change one field
-     * - HTTP Status should be 200
+     * Testing an authenticated user can not update a field with an empty string
+     * - HTTP Status should be 422
      *
      * @return void
      */
-    public function test_updateOnlyTitleFromTask(): void
+    public function test_couldNotUpdateTaskWithEmptyTitle(): void
     {
-        // load a task for an update
-        $task = Task::all()->first();
-        $newData = ['title' => 'My new title'];
+        $task       = Task::factory()->create();
+        $newData    = ['title' => ''];
 
         $response = $this->updateTask($task, $newData);
-        $response->assertStatus(Response::HTTP_OK)
-            ->assertJsonPath('data.title', $newData['title'])
-            ->assertJsonPath('data.description', $task->description)
-            ->assertJsonPath('data.status', $task->status)
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonPath('errors.title', fn(mixed $value) => is_array($value))
         ;
         // reload Task from DB
         $updatedTask = Task::find($task)->first();
-        $this->assertEquals($newData['title'], $updatedTask->title);
-
+        $this->assertNotEquals($newData['title'], $updatedTask->title);
     }
 
+
+    /** ------ DESCRIPTION FIELD VALIDATIONS -------------- */
 
     /**
      * Testing an authenticated user can only change one field
@@ -148,9 +173,8 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_updateOnlyDescriptionFromTask(): void
     {
-        // load a task for an update
-        $task = Task::all()->first();
-        $newData = ['description' => 'My new description'];
+        $task       = Task::factory()->create();
+        $newData    = ['description' => 'My new description'];
 
         $response = $this->updateTask($task, $newData);
         $response->assertStatus(Response::HTTP_OK)
@@ -164,6 +188,31 @@ class UpdateTest extends TaskTestsAbstract
     }
 
 
+
+    /**
+     * Testing an authenticated user can not update a field with an empty string
+     * - HTTP Status should be 422
+     *
+     * @return void
+     */
+    public function test_couldNotUpdateTaskWithEmptyDescription(): void
+    {
+        $task       = Task::factory()->create();
+        $newData    = ['description' => ''];
+
+        $response = $this->updateTask($task, $newData);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonPath('errors.description', fn(mixed $value) => is_array($value))
+        ;
+        // reload Task from DB
+        $updatedTask = Task::find($task)->first();
+        $this->assertNotEquals($newData['description'], $updatedTask->description);
+    }
+
+
+
+    /** ------ STATUS FIELD VALIDATIONS -------------- */
+
     /**
      * Testing an authenticated user can only change one field
      * - HTTP Status should be 200
@@ -172,10 +221,9 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_updateOnlyStatusFromTask(): void
     {
-        // load a task for an update
-        $task = Task::all()->first();
-        $newData = [ 'status' => TaskStatusEnum::IN_PROGRESS->value];
-        $response = $this->updateTask($task, $newData);
+        $task       = Task::factory()->create();
+        $newData    = [ 'status' => TaskStatusEnum::IN_PROGRESS->value];
+        $response   = $this->updateTask($task, $newData);
 
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data.title', $task->title)
@@ -187,50 +235,6 @@ class UpdateTest extends TaskTestsAbstract
         $this->assertEquals($newData['status'], $updatedTask->status);
     }
 
-
-    /**
-     * Testing an authenticated user can not update a field with an empty string
-     * - HTTP Status should be 422
-     *
-     * @return void
-     */
-    public function test_couldNotUpdateTaskWithEmptyTitle(): void
-    {
-        // load a task for an update
-        $task = Task::all()->first();
-        $newData = ['title' => ''];
-
-        $response = $this->updateTask($task, $newData);
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.title', fn(mixed $value) => is_array($value))
-        ;
-        // reload Task from DB
-        $updatedTask = Task::find($task)->first();
-        $this->assertNotEquals($newData['title'], $updatedTask->title);
-    }
-
-
-    /**
-     * Testing an authenticated user can not update a field with an empty string
-     * - HTTP Status should be 422
-     *
-     * @return void
-     */
-    public function test_couldNotUpdateTaskWithEmptyDescription(): void
-    {
-        // load a task for an update
-        $task = Task::all()->first();
-        $newData = ['description' => ''];
-
-        $response = $this->updateTask($task, $newData);
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.description', fn(mixed $value) => is_array($value))
-        ;
-        // reload Task from DB
-        $updatedTask = Task::find($task)->first();
-        $this->assertNotEquals($newData['description'], $updatedTask->description);
-    }
-
     /**
      * Testing that an authenticated user cannot update a task with a wrong status
      * - HTTP Status should be 422
@@ -240,10 +244,9 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_couldNotUpdateStatusFromTaskWithWrongValue()
     {
-        // load a task for an update
-        $task = Task::all()->first();
-        $newData = [ 'status' => 'Wrong Status Value'];
-        $response = $this->updateTask($task, $newData);
+        $task       = Task::factory()->create();
+        $newData    = [ 'status' => 'Wrong Status Value'];
+        $response   = $this->updateTask($task, $newData);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
             ->assertJsonPath('errors.status', fn(mixed $value) => is_array($value))
             ->assertJsonPath('errors.status.0',  'The selected status is invalid.')
@@ -261,8 +264,10 @@ class UpdateTest extends TaskTestsAbstract
      */
     public function test_couldNotUpdateTaskWithEmptyStatus(): void
     {
-        // load a task for an update
-        $task = Task::all()->first();
+        $task = Task::factory()
+            ->create([
+                'deadline' => Carbon::now()->modify('+ 30minutes')
+            ]);
         $newData = [ 'status' => ''];
         $response = $this->updateTask($task, $newData);
         $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
@@ -273,6 +278,64 @@ class UpdateTest extends TaskTestsAbstract
         $this->assertNotEquals($newData['status'], $updatedTask->status);
     }
 
+
+    /** ------ DEADLINE  FIELD VALIDATIONS -------------- */
+
+    /**
+     * Teastin an authenticate user can update the deadline of a task
+     * - HTTP Status should be 200
+     * - Task deadline has to be set with the new dateTime
+     *
+     * @return void
+     */
+    public function test_updateDeadlineOfTask(): void
+    {
+        $task = Task::factory()->create();
+        $newData = [
+            'deadline' => $task->deadline
+                ->modify('+30 days')
+                ->format('Y-m-d H:i:s')
+        ];
+        $response = $this->updateTask($task, $newData);
+        $response->assertStatus(Response::HTTP_OK)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.deadline', $newData['deadline'])
+        ;
+        $updatedTask = Task::find($task)->first();
+        $this->assertEquals($updatedTask->deadline, $newData['deadline']);
+        $this->assertNotEquals($updatedTask->deadline, $task->deadline);
+    }
+
+
+    /**
+     * Testing that an authenticate user cannot update a task with a deadline lower than now
+     * - HTTP Status should be 422
+     * - Response should include a corresponding error message telling about the error in the deadline field validation
+     *
+     * @return void
+     */
+    public function test_couldNotUpdateTaskWithADeadlineLowerThanNow():void
+    {
+
+        $task = Task::factory()
+            ->create([
+                'deadline' => Carbon::now()->modify('+5 days')
+            ]);
+
+        $newDeadline = Carbon::now()->modify('-5 seconds')
+            ->format('Y-m-d H:i:s')
+        ;
+
+        $newData = [ 'deadline' => $newDeadline];
+        $response = $this->updateTask($task, $newData);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertJsonPath('errors.deadline', fn(mixed $value) => is_array($value))
+        ;
+        // reload Task from DB
+        $updatedTask = Task::find($task)->first();
+        $this->assertEquals($task->deadline, $updatedTask->deadline);
+        $this->assertNotEquals($newData['deadline'], $updatedTask->deadline);
+    }
 
 
     /* -------------------------------------------------------------------------------------------------------------- */

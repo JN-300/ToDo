@@ -31,9 +31,11 @@ $ ddev artisan test
 
 # API Routes
 
-## CREATE TOKEN (Login)
+## AUTH
 
-### Request
+### CREATE TOKEN (Login)
+
+#### Request
 ```console
 curl --request POST \
   --url ./api/token \
@@ -45,7 +47,7 @@ curl --request POST \
 }
 ```
 
-### Response
+#### Response
 // success
 ```console
 # STATUS: 200
@@ -67,9 +69,9 @@ curl --request POST \
 }
 ```
 
-## DELETE TOKEN (Logout)
+### DELETE TOKEN (Logout)
 
-### Request
+#### Request
 ```console
 curl --request DELETE \
   --url ./api/token \
@@ -78,7 +80,7 @@ curl --request DELETE \
   --header 'Content-Type: application/json' \
 ```
 
-### Response
+#### Response
 // success
 ```console
 # STATUS: 200
@@ -96,8 +98,12 @@ curl --request DELETE \
 }
 ```
 
-## LIST TASKS
-### Request
+---
+
+## TASKS 
+
+### LIST TASKS
+#### Request
 ```console
 curl --request GET \
   --url ./api/tasks \
@@ -106,7 +112,7 @@ curl --request GET \
   --header 'Content-Type: application/json'
 ```
 
-### Response
+#### Response
 ```console
 # STATUS: 200
 {
@@ -123,8 +129,8 @@ curl --request GET \
 }
 ```
 
-## CREATE TASK
-### Request
+### CREATE TASK
+#### Request
 ```console
 curl --request POST \
   --url ./api/tasks\
@@ -137,7 +143,7 @@ curl --request POST \
         "status": "to_do"|"in_progress"|"done"
 }'
 ```
-### Response
+#### Response
 ```console
 # STATUS: 201
 {
@@ -154,8 +160,8 @@ curl --request POST \
 }
 ```
 
-## SHOW SINGLE TASK
-### Request
+### SHOW SINGLE TASK
+#### Request
 ```console
 curl --request GET \
   --url ./api/tasks/__TASK_UUID__ \
@@ -163,7 +169,7 @@ curl --request GET \
   --header 'Accept: application/json' \
   --header 'Content-Type: application/json'
 ```
-### Response
+#### Response
 // success
 ```console
 # STATUS: 200
@@ -189,9 +195,9 @@ curl --request GET \
 }
 ```
 
-## UPDATE TASK
+### UPDATE TASK
 
-### Request
+#### Request
 ```console
 curl --request PATCH \
   --url ./api/tasks/__TASK_UUID__ \
@@ -205,7 +211,7 @@ curl --request PATCH \
     }'
 ```
 
-### Response
+#### Response
 
 // success
 ```console
@@ -233,8 +239,8 @@ curl --request PATCH \
 }
 ```
 
-## DELETE TASK
-### Request
+### DELETE TASK
+#### Request
 ```console
 curl --request DELETE \
   --url ./api/tasks/__TASK_UUID__ \
@@ -243,7 +249,7 @@ curl --request DELETE \
   --header 'Content-Type: application/json' 
 ```
 
-### Response
+#### Response
 
 // success
 ```console
