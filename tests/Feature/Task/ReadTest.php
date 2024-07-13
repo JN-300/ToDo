@@ -18,7 +18,7 @@ class ReadTest extends TaskTestsAbstract
      * Testing of listing all available tasks
      *
      * - HTTP Status should be 200
-     * - Response should have an array with main key errors and subarray with corresponding error messages for field title
+     * - Response should have an array with key data and an amount of the task ->count
      *
      * @return void
      */
@@ -49,7 +49,7 @@ class ReadTest extends TaskTestsAbstract
     /**
      * Testing that an authenticated user can show a task
      * - HTTP Status should be 200
-     * - Response should be an array with the releavant task data (title, description, status, ...).
+     * - Response should be an array with the relevant task data (title, description, status, ...).
      *
      * @return void
      */
