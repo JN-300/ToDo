@@ -57,7 +57,12 @@ class ProjectController extends Controller
      */
     public function update(UpdateProjectRequest $request, Project $project)
     {
-        //
+        $project->update($request->all());
+        return (new ProjectResource($project))
+            ->additional([
+                'success' => true,
+                'message' => 'Project successfully updated'
+            ]);
     }
 
     /**
@@ -65,6 +70,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        //
+        $project->delete();
+        return response()->json(['success' => true, 'message' => 'Project successfully deleted']);
     }
 }

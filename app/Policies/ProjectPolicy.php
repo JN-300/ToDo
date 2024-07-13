@@ -44,17 +44,23 @@ class ProjectPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Project $project): bool
+    public function update(User $user, Project $project): Response
     {
-        //
+        return $user
+            ? Response::allow()
+            : Response::deny()
+            ;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Project $project): bool
+    public function delete(User $user, Project $project): Response
     {
-        //
+        return $user
+            ? Response::allow()
+            : Response::deny()
+            ;
     }
 
     /**
