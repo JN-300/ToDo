@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectCollection;
@@ -25,6 +26,18 @@ class ProjectController extends Controller
     public function index():ProjectCollection
     {
         $projects = Project::all();
+
+        // TODO: Create as FilterRequest with configurable 'with' params
+        if (request()->query->has('with')) {
+            $loadRelations = request()->query('with');
+            if (!is_array($loadRelations))
+            {
+                $loadRelations = explode(',', $loadRelations);
+            }
+            $loadRelations = array_filter($loadRelations, fn($item) => $item == 'tasks');
+            $projects->load($loadRelations);
+        }
+
         return new ProjectCollection($projects);
     }
 
@@ -35,7 +48,6 @@ class ProjectController extends Controller
     public function store(StoreProjectRequest $request):ProjectResource
     {
         $project = Project::create($request->all());
-
         return (new ProjectResource($project))
             ->additional([
                 'success' => true,
@@ -48,6 +60,16 @@ class ProjectController extends Controller
      */
     public function show(Project $project):ProjectResource
     {
+        if (request()->query->has('with')) {
+            $loadRelations = request()->query('with');
+            if (!is_array($loadRelations))
+            {
+                $loadRelations = explode(',', $loadRelations);
+            }
+            $loadRelations = array_filter($loadRelations, fn($item) => $item == 'tasks');
+            $project->load($loadRelations);
+        }
+//        $project->load('tasks');
         return new ProjectResource($project);
     }
 
@@ -58,6 +80,7 @@ class ProjectController extends Controller
     public function update(UpdateProjectRequest $request, Project $project)
     {
         $project->update($request->all());
+        $project->load('tasks');
         return (new ProjectResource($project))
             ->additional([
                 'success' => true,

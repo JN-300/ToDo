@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskCollection;
@@ -26,8 +27,19 @@ class TaskController extends Controller
     {
         $tasks = Task::all();
 
+        // TODO: Create as FilterRequest with configurable 'with' params
+        if (request()->query->has('with')) {
+            $loadRelations = request()->query('with');
+            if (!is_array($loadRelations))
+            {
+                $loadRelations = explode(',', $loadRelations);
+            }
+            $loadRelations = array_filter($loadRelations, fn($item) => $item == 'project');
+            $tasks->load($loadRelations);
+        }
+
+
         return new TaskCollection($tasks);
-//        return TaskResource::collection($tasks);
     }
 
 
@@ -36,7 +48,9 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
+        /** @var Task $task */
         $task = Task::create($request->all());
+        $task->load('project');
         return (new TaskResource($task))
             ->additional([
                 'success' => true,
@@ -49,6 +63,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
+        $task->load('project');
         return new TaskResource($task);
     }
 
@@ -58,7 +73,7 @@ class TaskController extends Controller
     public function update(UpdateTaskRequest $request, Task $task)
     {
         $task->update($request->all());
-
+        $task->load('project');
         return (new TaskResource($task))
             ->additional([
                 'success' => true,

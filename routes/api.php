@@ -19,8 +19,10 @@ Route::name('token.' )
 
 Route::middleware('auth:sanctum')
     ->group(function () {
-        Route::apiResource('tasks', \App\Http\Controllers\TaskController::class);
-        Route::apiResource('projects', \App\Http\Controllers\ProjectController::class);
+        Route::apiResource('tasks', \App\Http\Controllers\Api\TaskController::class);
+
+        Route::get('projects/{project}/tasks', \App\Http\Controllers\Api\Project\ProjectTasks::class);
+        Route::apiResource('projects', \App\Http\Controllers\Api\ProjectController::class);
         Route::get('/user', function (Request $request) {
             return response()->json($request->user());
         });

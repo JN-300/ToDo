@@ -16,7 +16,8 @@ class Task extends Model
         'title',
         'description',
         'status',
-        'deadline'
+        'deadline',
+        'project_id'
     ];
 
 
@@ -29,5 +30,11 @@ class Task extends Model
         static::addGlobalScope(self::SCOPE_ORDER, function (Builder $builder) {
             $builder->orderBy('created_at', 'DESC');
         });
+    }
+
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
     }
 }

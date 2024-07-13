@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\TaskStatusEnum;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -36,5 +37,10 @@ class TaskFactory extends Factory
             ];
         }
         );
+    }
+
+    public function withOneOfGivenProjects(Collection $projects): static
+    {
+        return $this->state(fn(array $attributes) => ['project_id' => fake()->randomElement($projects->pluck('id'))]);
     }
 }

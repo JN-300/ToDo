@@ -5,6 +5,12 @@ See https://ddev.readthedocs.io/en/stable/ for  installation instructions of dde
 A little bit more about the advantages of development with ddev instead of a plain docker setup will hopefully come later.
 
 
+
+## CHANGES
+- Project-Task Relations
+  - Task now can have a relation to a project
+
+
 ## Using ddev
 ... more will be come later
 
@@ -100,6 +106,64 @@ curl --request DELETE \
 
 ---
 
+## PROJECTS
+### LIST PROJECTS
+#### Request
+```console
+curl --request GET \
+  --url ./api/projects \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json'
+```
+
+### CREATE PROJECT
+#### Request
+```console
+curl --request POST \
+  --url ./api/projects\
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --data '{
+        "title": STRING
+}'
+```
+
+### SHOW SINGLE PROJECT
+#### Request
+```console
+curl --request GET \
+  --url ./api/projects/__PROJECT__ID__ \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json'
+```
+
+
+### SHOW TASKS OF A SINGLE PROJECT
+#### Request
+```console
+curl --request GET \
+  --url ./api/projects/__PROJECT__ID__/tasks \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json'
+```
+
+### Update Project
+#### Request
+```console
+curl --request POST \
+  --url ./api/projects/__PROJECT__ID__\
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json' \
+  --data '{
+        "title": STRING
+}'
+```
+
 ## TASKS 
 
 ### LIST TASKS
@@ -107,6 +171,16 @@ curl --request DELETE \
 ```console
 curl --request GET \
   --url ./api/tasks \
+  --header 'Authorization: Bearer __ACCESS_TOKEN__' \
+  --header 'Accept: application/json' \
+  --header 'Content-Type: application/json'
+```
+
+### LIST TASKS WITH PROJECT DATA
+#### Request
+```console
+curl --request GET \
+  --url ./api/tasks?with=project \
   --header 'Authorization: Bearer __ACCESS_TOKEN__' \
   --header 'Accept: application/json' \
   --header 'Content-Type: application/json'
