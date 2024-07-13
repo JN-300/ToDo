@@ -20,6 +20,7 @@ Route::name('token.' )
 Route::middleware('auth:sanctum')
     ->group(function () {
         Route::apiResource('tasks', \App\Http\Controllers\TaskController::class);
+        Route::apiResource('projects', \App\Http\Controllers\ProjectController::class);
         Route::get('/user', function (Request $request) {
             return response()->json($request->user());
         });
