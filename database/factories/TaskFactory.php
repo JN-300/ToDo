@@ -28,17 +28,40 @@ class TaskFactory extends Factory
         ];
     }
 
-    public function withRandomDate(): static
+
+    public function withRandomStatus(TaskStatusEnum ... $status):static
     {
-        return $this->state(function (array $attributes) {
-            $created_at = fake()->dateTimeBetween(startDate: '-1 year');
+        return $this->state(fn(array $attributes) => ['status' => fake()->randomElement($status)]);
+    }
+    public function withRandomDate(string $startDate = '-1 year', string $endDate = 'now'): static
+    {
+        return $this->state(function (array $attributes) use ($startDate,$endDate){
+            $created_at = fake()->dateTimeBetween(startDate: $startDate, endDate: $endDate);
             $deadline = fake()->dateTimeBetween(startDate: $created_at, endDate: '+1 year');
             return [
                 'created_at' => $created_at,
                 'deadline' => $deadline
             ];
-        }
-        );
+        });
+    }
+
+    public function withRandomDeadline(?string $startDate = null, ?string $endDate = null): static
+    {
+        return $this->state(function (array $attributes) use ($startDate,$endDate){
+            $deadline = ($startDate && $endDate)
+                ? fake()->dateTimeBetween(startDate: $startDate, endDate: $endDate)
+                : (($endDate)
+                    ? fake()->dateTime(max: $endDate)
+                    : fake()->dateTimeBetween(startDate: $startDate, endDate:  '+1 year')
+                )
+            ;
+            $created_at = fake()->dateTime($deadline);
+//            $created_at = fake()->dateTimeBetween(startDate: $startDate, endDate: $deadline);
+            return [
+                'created_at' => $created_at,
+                'deadline' => $deadline
+            ];
+        });
     }
 
     public function withProject(Project $project):static

@@ -69,7 +69,6 @@ class ProjectController extends Controller
             $loadRelations = array_filter($loadRelations, fn($item) => $item == 'tasks');
             $project->load($loadRelations);
         }
-//        $project->load('tasks');
         return new ProjectResource($project);
     }
 

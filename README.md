@@ -43,8 +43,22 @@ DELETE ./api/token
 
 GET  ./api/projects
 POST ./api/projects
+GET ./api/projects/{project}
+PATCH ./api/projects/{project}
+DELETE ./api/projects/{project}
 
+GET  ./api/tasks
+POST ./api/tasks
+GET ./api/tasks/{task}
+PATCH ./api/tasks/{task}
+DELETE ./api/tasks/{task}
 
+// TODO: 
+// following api routes will be refactored to a filterable admin controller
+// in the next release
+GET ./api/tasks/overdue
+GET ./api/tasks/project/{project}
+GET ./api/tasks/user/{user}
 ```
 ## AUTH
 

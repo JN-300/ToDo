@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\TaskStatusEnum;
 use App\Models\Traits\AddOwnerTrait;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -42,6 +44,17 @@ class Task extends Model
     public function scopeForUser(\Illuminate\Contracts\Database\Eloquent\Builder $query, User $user)
     {
         $query->where('owner_id', $user->id ?? null);
+    }
+
+    public function scopeByStatus(\Illuminate\Contracts\Database\Eloquent\Builder $query, TaskStatusEnum ...$status){
+        $query->whereIn('status', $status);
+    }
+    public function scopeNotByStatus(\Illuminate\Contracts\Database\Eloquent\Builder $query, TaskStatusEnum ...$status){
+        $query->whereNotIn('status', $status);
+    }
+
+    public function scopeOverdue(\Illuminate\Contracts\Database\Eloquent\Builder $query) {
+        $query->where('deadline', '<=', Carbon::now());
     }
 
 
