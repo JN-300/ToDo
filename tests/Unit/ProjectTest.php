@@ -12,6 +12,10 @@ class ProjectTest extends TestCase
 
     use RefreshDatabase;
 
+    /**
+     * Testing create a project through factory
+     * @return void
+     */
     public function test_factoryCreate():void
     {
         $project = Project::factory()->create();
@@ -20,15 +24,24 @@ class ProjectTest extends TestCase
 //        $this->assertNotEmpty($project->title);
     }
 
+    /**
+     * Testing create project
+     * @return void
+     */
     public function test_createProject():void
     {
         $projectData = [
             'title' => 'Ich bin der Titel des Testprojektes'
         ];
 
-        $project =Project::create($projectData);
+        $project = Project::create($projectData);
         $this->assertTrue($project instanceof Project);;
     }
+
+    /**
+     * Testing read project
+     * @return void
+     */
     public function test_readProject():void
     {
 
@@ -39,6 +52,11 @@ class ProjectTest extends TestCase
         $readProject = Project::find($project)->first();
         $this->assertEquals($project->title, $readProject->title);
     }
+
+    /**
+     * Testing updating project
+     * @return void
+     */
     public function test_updateProject(): void
     {
         $project = Project::factory()->create();
@@ -50,6 +68,10 @@ class ProjectTest extends TestCase
         $this->assertEquals($project->title, $updatedProject->title);
     }
 
+    /**
+     * Testing deleting project
+     * @return void
+     */
     public function test_deleteProject(): void
     {
         $project = Project::factory()->create();

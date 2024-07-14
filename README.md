@@ -37,6 +37,15 @@ $ ddev artisan test
 
 # API Routes
 
+```console
+POST ./api/token
+DELETE ./api/token
+
+GET  ./api/projects
+POST ./api/projects
+
+
+```
 ## AUTH
 
 ### CREATE TOKEN (Login)

@@ -24,11 +24,45 @@ class ReadTest extends TaskTestsAbstract
      */
     public function test_listTasks():void
     {
+        $owner      = User::factory()->create();
+        $tasks      = Task::factory(10)
+            ->withOwner($owner)
+            ->create();
         $taskCount = Task::all()->count();
-        $response = $this->readTasks();
+        $response = $this->readTasks(user: $owner);
         $response->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data', fn(array $data) => count($data) === $taskCount)
         ;
+    }
+
+    /**
+     * Testing an authenticated user recieves only his tasks
+     *
+     * - HTTP Status: 200
+     * @return void
+     */
+    public function test_listOnlyMyTasks():void
+    {
+        // create 10 other User
+        $users = User::factory(10)->create();
+        // create 100 task for the other users
+        Task::factory(100)
+            ->withOneOfGivenOwner($users)
+            ->create();
+
+        // create test user
+        $user = User::factory()->create();
+        // create 13 example tasks for this user
+        Task::factory(13)->withOwner($user)->create();
+
+        // tests
+        // test task count
+        $this->assertDatabaseCount('tasks', 113);
+
+        $this->readTasks(user: $user)
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJsonCount(13, 'data');
+
     }
 
     /**
@@ -39,8 +73,11 @@ class ReadTest extends TaskTestsAbstract
      */
     public function test_couldNotListTasksAsUnauthenticatedUser():void
     {
-        $response = $this->getJson('api/tasks');
-        $response->assertStatus(Response::HTTP_UNAUTHORIZED)
+        $owner = User::factory()->create();
+        Task::factory(10)->withOwner($owner)->create();
+
+        $this->getJson('api/tasks')
+            ->assertStatus(Response::HTTP_UNAUTHORIZED)
             ->assertJsonPath('message', 'Unauthenticated.');
         ;
     }
@@ -55,13 +92,31 @@ class ReadTest extends TaskTestsAbstract
      */
     public function test_showTask():void
     {
-        $task = Task::all()->first();
-        $response = $this->readTasks($task);
-        $response->assertStatus(Response::HTTP_OK)
+        $owner  = User::factory()->create();
+        $task   = Task::factory()->withOwner($owner)->create();
+        $this->readTasks(task: $task, user: $owner)
+            ->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data.title', $task->title)
             ->assertJsonPath('data.description', $task->description)
-            ->assertJsonPath('data.status', $task->status)
+            ->assertJsonPath('data.status', $task->status->value)
         ;
+    }
+
+    /**
+     * Testing a authenticated user cannot show task detail of a task of another user
+     *
+     * - HTTP Status: 403
+     * @return void
+     */
+    public function test_couldNotShowTaskOfOtherUser():void
+    {
+        $owner  = User::factory()->create();
+        $task   = Task::factory()->withOwner($owner)->create();
+
+        $otherUser = User::factory()->create();
+        $this->readTasks(task: $task, user: $otherUser)
+            ->assertStatus(Response::HTTP_FORBIDDEN)
+            ;
     }
 
     /**
@@ -73,9 +128,10 @@ class ReadTest extends TaskTestsAbstract
      */
     public function test_couldNotShowTaskAsUnauthenticatedUser():void
     {
-        $task = Task::all()->first();
-        $response = $this->getJson('api/tasks/'.$task->id);
-        $response->assertStatus(Response::HTTP_UNAUTHORIZED)
+        $owner = User::factory()->create();
+        $task = Task::factory()->withOwner($owner)->create();
+        $this->getJson('api/tasks/'.$task->id)
+            ->assertStatus(Response::HTTP_UNAUTHORIZED)
             ->assertJsonPath('message', 'Unauthenticated.');
     }
 
@@ -83,9 +139,9 @@ class ReadTest extends TaskTestsAbstract
     /* -------------------------------------------------------------------------------------------------------------- */
 
 
-    private function readTasks(?Task $task = null):TestResponse
+    private function readTasks(?Task $task = null, ?User $user = null):TestResponse
     {
-        $user = User::all()->first();
+        $user = $user ?? User::factory()->create();
         Sanctum::actingAs($user);
 
         return ($task)

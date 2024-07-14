@@ -19,12 +19,20 @@ class TaskPolicy
             ;
     }
 
+    public function viewAnyOfOtherUser(User $user, User $otherUser): Response
+    {
+        return $user && $otherUser->id === $user->id
+            ? Response::allow()
+            : Response::deny()
+            ;
+    }
+
     /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Task $task): Response
     {
-        return $user
+        return ($user && $task->owner->id === $user->id)
             ? Response::allow()
             : Response::deny()
             ;
@@ -46,7 +54,7 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): Response
     {
-        return $user
+        return ($user && $task->owner->id === $user->id)
             ? Response::allow()
             : Response::deny()
             ;
@@ -57,7 +65,7 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): Response
     {
-        return $user
+        return ($user && $task->owner->id === $user->id)
             ? Response::allow()
             : Response::deny()
             ;

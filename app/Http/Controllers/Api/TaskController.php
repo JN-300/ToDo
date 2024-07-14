@@ -10,6 +10,7 @@ use App\Http\Resources\TaskResource;
 use App\Models\Task;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -25,8 +26,7 @@ class TaskController extends Controller
      */
     public function index():TaskCollection
     {
-        $tasks = Task::all();
-
+        $tasks = Task::forUser(Auth::user())->get();
         // TODO: Create as FilterRequest with configurable 'with' params
         if (request()->query->has('with')) {
             $loadRelations = request()->query('with');
@@ -37,7 +37,6 @@ class TaskController extends Controller
             $loadRelations = array_filter($loadRelations, fn($item) => $item == 'project');
             $tasks->load($loadRelations);
         }
-
 
         return new TaskCollection($tasks);
     }

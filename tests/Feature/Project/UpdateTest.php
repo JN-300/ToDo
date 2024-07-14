@@ -14,6 +14,14 @@ class UpdateTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Testing an authenticated user can update a project
+     * currently every authenticated user can update every project
+     *
+     * - HTTP Status: 200
+     *
+     * @return void
+     */
     public function test_updateProject():void
     {
         $project = Project::factory()->create();
@@ -28,6 +36,12 @@ class UpdateTest extends TestCase
     }
 
 
+    /**
+     * Testing that an unauthenticated user cannot update any project
+     *
+     * - HTTP Status: 401
+     * @return void
+     */
     public function test_couldNotUpdateProjectAsUnauthenticatdUser():void
     {
         $project = Project::factory()->create();
@@ -40,6 +54,12 @@ class UpdateTest extends TestCase
         ;
     }
 
+    /**
+     * Testing that an authenticated user can not update/remove the title field from a project
+     *
+     * - HTTP Status: 422
+     * @return void
+     */
     public function test_couldNotUpdateProjectWithEmptyTitle():void
     {
         $project = Project::factory()->create();

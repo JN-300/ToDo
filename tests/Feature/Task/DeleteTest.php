@@ -21,14 +21,19 @@ class DeleteTest extends TaskTestsAbstract
      */
     public function test_deleteTask():void
     {
-        $taskCount = Task::all()->count();
-        $task = Task::all()->first();
-
-        $response =$this->destroyTask($task);
-        $response->assertStatus(Response::HTTP_OK)
+        $owner      = User::factory()->create();
+        $task       = Task::factory()
+            ->withOwner($owner)
+            ->create();
+        // testing if task created
+        $this->assertDatabaseHas('tasks', ['id' => $task->id]);
+        // testing destroy route
+        $this->destroyTask($task, user: $owner)
+            ->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('success', true)
         ;
-        $this->assertDatabaseCount(Task::class, $taskCount-1);
+        // testing if task deleted
+        $this->assertDatabaseMissing('tasks', ['id' => $task->id]);
     }
 
     /**
@@ -40,14 +45,16 @@ class DeleteTest extends TaskTestsAbstract
      */
     public function test_couldNotDeleteTaskAsUnauthenticatedUser():void
     {
-        $taskCount = Task::all()->count();
-        $task = Task::all()->first();
+        $owner      = User::factory()->create();
+        $task      = Task::factory()
+            ->withOwner($owner)
+            ->create();
 
-        $response =  $this->deleteJson('api/tasks/'.$task->id);
-        $response->assertStatus(Response::HTTP_UNAUTHORIZED)
+        $this->deleteJson('api/tasks/'.$task->id)
+            ->assertStatus(Response::HTTP_UNAUTHORIZED)
             ->assertJsonPath('message', 'Unauthenticated.');
 
-        $this->assertDatabaseCount(Task::class, $taskCount);
+        $this->assertDatabaseHas('tasks', ['id' => $task->id]);
     }
 
 
@@ -58,9 +65,9 @@ class DeleteTest extends TaskTestsAbstract
      * @param Task $task
      * @return \Illuminate\Testing\TestResponse
      */
-    private function destroyTask(Task $task):TestResponse
+    private function destroyTask(Task $task, ?User $user = null):TestResponse
     {
-        $user = User::all()->first();
+        $user = $user ?? User::factory()->create();
         Sanctum::actingAs($user);
 
         return $this->deleteJson('api/tasks/'.$task->id);

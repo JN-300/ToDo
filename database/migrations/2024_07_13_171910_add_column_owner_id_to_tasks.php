@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->foreignUuid('project_id')
+            $table->foreignUuid('owner_id')
                 ->nullable()
                 ->constrained(
-                    table: 'projects',
+                    table: 'users',
                     column: 'id',
-                    indexName: 'task_project_id'
+                    indexName: 'task_owner_id'
                 )
                 ->nullOnDelete()
             ;
@@ -25,20 +25,12 @@ return new class extends Migration
     }
 
     /**
-     *
-    $table->foreign('category_id')
-    ->references('id')
-    ->on('categories')
-    ->onDelete('cascade')
-     */
-
-    /**
      * Reverse the migrations.
      */
     public function down(): void
     {
         Schema::table('tasks', function (Blueprint $table) {
-            $table->removeColumn('project_id');
+            $table->removeColumn('owner_id');
         });
     }
 };

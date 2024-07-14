@@ -48,7 +48,7 @@ class CreateTaskTest extends TaskTestsAbstract
     }
 
     /**
-     * Testing that an unautheticated user cannot create a task
+     * Testing that an unauthenticated user cannot create a task
      * - HTTP Status should be 401
      * - Response should be message: Unauthenticated.
      *
@@ -250,9 +250,9 @@ class CreateTaskTest extends TaskTestsAbstract
      * @param array $data
      * @return \Illuminate\Testing\TestResponse
      */
-    private function createTask(array $data): TestResponse
+    private function createTask(array $data, ?User $user = null): TestResponse
     {
-        $user = User::all()->first();
+        $user = $user ?? User::factory()->create();
         Sanctum::actingAs($user);
         return $this->postJson('/api/tasks/', $data);
     }

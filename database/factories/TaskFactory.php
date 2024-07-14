@@ -3,6 +3,8 @@
 namespace Database\Factories;
 
 use App\Enums\TaskStatusEnum;
+use App\Models\Project;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -39,8 +41,20 @@ class TaskFactory extends Factory
         );
     }
 
+    public function withProject(Project $project):static
+    {
+        return $this->state(fn(array $attributes) => ['project_id' => $project->id]);
+    }
     public function withOneOfGivenProjects(Collection $projects): static
     {
         return $this->state(fn(array $attributes) => ['project_id' => fake()->randomElement($projects->pluck('id'))]);
+    }
+
+    public function withOwner(User $owner): static {
+        return $this->state(fn(array $attributes) => ['owner_id' => $owner->id]);
+    }
+    public function withOneOfGivenOwner(Collection $owner): static
+    {
+        return $this->state(fn(array $attributes) => ['owner_id' => fake()->randomElement($owner->pluck('id'))]);
     }
 }

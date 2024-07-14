@@ -3,6 +3,7 @@
 namespace Tests\Feature\Project;
 
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Response;
 use Illuminate\Testing\TestResponse;
@@ -21,7 +22,7 @@ class ReadTest extends TestCase
      *
      * @return void
      */
-    public function test_listTasks():void
+    public function test_listProjects():void
     {
         $projectAmount = 20;
         Project::factory($projectAmount)->create();
@@ -39,7 +40,7 @@ class ReadTest extends TestCase
      * - Response should be message: Unauthenticated.
      * @return void
      */
-    public function test_couldNotListTasksAsUnauthenticatedUser():void
+    public function test_couldNotListProjectsAsUnauthenticatedUser():void
     {
         $response = $this->getJson('api/projects');
         $response->assertStatus(Response::HTTP_UNAUTHORIZED)
@@ -55,7 +56,7 @@ class ReadTest extends TestCase
      *
      * @return void
      */
-    public function test_showTask():void
+    public function test_showProjects():void
     {
         $project = Project::factory()->create();
         $this->assertNotEmpty($project->title);
@@ -72,7 +73,7 @@ class ReadTest extends TestCase
      *
      * @return void
      */
-    public function test_couldNotShowTaskAsUnauthenticatedUser():void
+    public function test_couldNotShowProjectAsUnauthenticatedUser():void
     {
         $project = Project::factory()->create();
         $response = $this->getJson('api/projects/'.$project->id);
@@ -83,9 +84,9 @@ class ReadTest extends TestCase
 
     /* -------------------------------------------------------------------------------------------------------------- */
 
-    private function readProjectsAsAuthenticatedUser(?Project $project = null): TestResponse
+    private function readProjectsAsAuthenticatedUser(?Project $project = null, ?User $user = null): TestResponse
     {
-        $user = \App\Models\User::factory()->create();
+        $user = $user ??  \App\Models\User::factory()->create();
         Sanctum::actingAs($user);
 
         return ($project)
