@@ -45,7 +45,7 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTaskRequest $request)
+    public function store(StoreTaskRequest $request):TaskResource
     {
         /** @var Task $task */
         $task = Task::create($request->all());
@@ -60,7 +60,7 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Task $task)
+    public function show(Task $task):TaskResource
     {
         $task->load('project');
         return new TaskResource($task);
@@ -69,7 +69,7 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTaskRequest $request, Task $task)
+    public function update(UpdateTaskRequest $request, Task $task):TaskResource
     {
         $task->update($request->all());
         $task->load('project');

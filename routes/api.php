@@ -29,6 +29,15 @@ Route::middleware('auth:sanctum')
         Route::get('/user', function (Request $request) {
             return response()->json($request->user());
         });
+
+        Route::name('admin.')
+            ->middleware('isAdmin')
+            ->prefix('admin')
+            ->group(function () {
+                Route::apiResource('tasks', \App\Http\Controllers\Api\Admin\TaskController::class)
+                    ->only('index', 'show', 'update', 'destroy')
+                ;
+            });
     });
 
 //

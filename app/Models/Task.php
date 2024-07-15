@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class Task extends Model
 {
@@ -46,6 +47,20 @@ class Task extends Model
         $query->where('owner_id', $user->id ?? null);
     }
 
+    public function scopeForUserIds(\Illuminate\Contracts\Database\Eloquent\Builder $query, int ...$userIds)
+    {
+        $query->whereIn('owner_id', $userIds ?? null);
+    }
+
+
+    public function scopeForProjectIds(\Illuminate\Contracts\Database\Eloquent\Builder $query, string ...$projectIds)
+    {
+        $projectIds = Collect($projectIds)
+            ->filter(fn(string $projectId) => Str::isUuid($projectId))
+            ->toArray()
+        ;
+        $query->whereIn('project_id', $projectIds ?? null);
+    }
     public function scopeByStatus(\Illuminate\Contracts\Database\Eloquent\Builder $query, TaskStatusEnum ...$status){
         $query->whereIn('status', $status);
     }
@@ -53,7 +68,7 @@ class Task extends Model
         $query->whereNotIn('status', $status);
     }
 
-    public function scopeOverdue(\Illuminate\Contracts\Database\Eloquent\Builder $query) {
+    public function scopeOverdue(\Illuminate\Contracts\Database\Eloquent\Builder $query, bool $overdue = true) {
         $query->where('deadline', '<=', Carbon::now());
     }
 

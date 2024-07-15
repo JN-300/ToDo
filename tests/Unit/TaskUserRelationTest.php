@@ -2,15 +2,26 @@
 
 namespace Tests\Unit;
 
-use PHPUnit\Framework\TestCase;
+use App\Models\Task;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class TaskUserRelationTest extends TestCase
 {
+    use RefreshDatabase;
     /**
      * A basic unit test example.
      */
-    public function test_example(): void
+    public function test_createdTaskHasOwner(): void
     {
-        $this->assertTrue(true);
+        $owner = User::factory()->create();
+        $task = Task::factory()
+            ->withOwner($owner)
+            ->create()
+        ;
+
+        $this->assertInstanceOf(User::class, $task->owner);
+        $this->assertEquals($task->owner->id, $owner->id);
     }
 }

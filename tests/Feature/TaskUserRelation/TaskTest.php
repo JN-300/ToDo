@@ -58,7 +58,7 @@ class TaskTest extends TestCase
      * - HTTP Status should be 403
      * @return void
      */
-    public function test_couldNotlistAllTasksByOtherUser():void
+    public function test_couldNotListAllTasksByOtherUser():void
     {
         $projects   = Project::factory(4)->create();
         $user       = User::factory()->create();
@@ -79,6 +79,37 @@ class TaskTest extends TestCase
         Sanctum::actingAs($normalOtherUser);
         $response = $this->getJson('api/tasks/user/'.$user->id);
         $response
+            ->assertStatus(Response::HTTP_FORBIDDEN)
+        ;
+    }
+
+    public function test_couldNotUpdateTaskFromOtherUser():void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $task = Task::factory()
+            ->withOwner($otherUser)
+            ->create();
+
+        $this->actingAs($user)
+            ->patchJson('api/tasks/'.$task->id, ['title' => 'new title'])
+            ->assertStatus(Response::HTTP_FORBIDDEN)
+        ;
+    }
+
+
+    public function test_couldNotDeleteTaskFromOtherUser():void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        $task = Task::factory()
+            ->withOwner($otherUser)
+            ->create();
+
+        $this->actingAs($user)
+            ->deleteJson('api/tasks/'.$task->id)
             ->assertStatus(Response::HTTP_FORBIDDEN)
         ;
     }

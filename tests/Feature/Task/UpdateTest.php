@@ -430,6 +430,22 @@ class UpdateTest extends TaskTestsAbstract
     }
 
 
+    public function test_couldNotUpdateOverdueTask():void
+    {
+        $owner = User::factory()->create();
+        $task = Task::factory()
+            ->withOwner($owner)
+            ->withRandomDeadline(endDate: '-1 second')
+            ->create(['status' => TaskStatusEnum::IN_PROGRESS]);
+        $newData = [
+            'title' => 'My new title from admin'
+        ];
+        $this->updateTask($task, $newData, $owner)
+            ->assertStatus(Response::HTTP_FORBIDDEN)
+            ->assertJsonPath('message', 'Update of overdue tasks not allowed.');
+    }
+
+
     /* -------------------------------------------------------------------------------------------------------------- */
 
 
