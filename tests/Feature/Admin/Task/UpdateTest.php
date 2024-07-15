@@ -85,7 +85,7 @@ class UpdateTest extends TestCase
             ->withRandomDeadline(endDate: '-1 second')
             ->create(['status' => TaskStatusEnum::IN_PROGRESS]);
         $newData = [
-            'deadline' => Carbon::now()->modify('+ 1day')->format('Y-m-d H:i:s')
+            'deadline' => Carbon::now()->modify('+ 1day')->toIso8601String()
         ];
         $this->updateTask($task, $newData, $admin)
             ->assertStatus(Response::HTTP_OK)

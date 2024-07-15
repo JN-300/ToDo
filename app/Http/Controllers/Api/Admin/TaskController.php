@@ -48,7 +48,8 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task): TaskResource
     {
-        $task->update($request->validated());
+        $task->load(['owner', 'project']);
+        $task->update($request->all());
         return (new TaskResource($task))
             ->additional([
                 'success' => true,

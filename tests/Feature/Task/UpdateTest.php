@@ -29,12 +29,12 @@ class UpdateTest extends TaskTestsAbstract
         $owner  = User::factory()->create();
         $task   = Task::factory()
             ->withOwner($owner)
-            ->create();
+            ->create(['status' => TaskStatusEnum::TODO]);
 
         $newData = [
             'title' => 'My new title',
             'description' => 'My new description',
-            'status' => TaskStatusEnum::IN_PROGRESS->value
+            'status' => TaskStatusEnum::IN_PROGRESS
         ];
 
         $this->updateTask(task: $task, data: $newData, user: $owner)
@@ -42,7 +42,7 @@ class UpdateTest extends TaskTestsAbstract
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.title', $newData['title'])
             ->assertJsonPath('data.description', $newData['description'])
-            ->assertJsonPath('data.status', $newData['status'])
+            ->assertJsonPath('data.status', $newData['status']->value)
         ;
 
         // reload Task from DB
@@ -85,7 +85,7 @@ class UpdateTest extends TaskTestsAbstract
         // check if model is not modified
         $this->assertEquals($task->title, $updatedTask->title);
         $this->assertEquals($task->description, $updatedTask->description);
-        $this->assertEquals($task->status->value, $updatedTask->status);
+        $this->assertEquals($task->status, $updatedTask->status);
 
     }
 
@@ -124,7 +124,7 @@ class UpdateTest extends TaskTestsAbstract
         // check if model is not modified
         $this->assertEquals($task->title, $updatedTask->title);
         $this->assertEquals($task->description, $updatedTask->description);
-        $this->assertEquals($task->status->value, $updatedTask->status);
+        $this->assertEquals($task->status, $updatedTask->status);
 
     }
 
@@ -298,14 +298,14 @@ class UpdateTest extends TaskTestsAbstract
             ->withOwner($owner)
             ->create(['status' => TaskStatusEnum::TODO]
         );
-        $newData    = [ 'status' => TaskStatusEnum::IN_PROGRESS->value];
+        $newData    = [ 'status' => TaskStatusEnum::IN_PROGRESS];
 
 
         $this->updateTask(task: $task, data: $newData, user: $owner)
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data.title', $task->title)
             ->assertJsonPath('data.description', $task->description)
-            ->assertJsonPath('data.status', $newData['status'])
+            ->assertJsonPath('data.status', $newData['status']->value)
         ;
         // reload Task from DB
         $updatedTask = Task::find($task)->first();
@@ -381,13 +381,13 @@ class UpdateTest extends TaskTestsAbstract
         $newData = [
             'deadline' => $task->deadline
                 ->modify('+30 days')
-                ->format('Y-m-d H:i:s')
+//                ->format('Y-m-d H:i:s')
         ];
 
         $this->updateTask(task: $task, data: $newData, user: $owner)
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.deadline', $newData['deadline'])
+            ->assertJsonPath('data.deadline', fn($time) =>  Carbon::make($time) == $newData['deadline'])
         ;
         $updatedTask = Task::find($task)->first();
         $this->assertEquals($updatedTask->deadline, $newData['deadline']);

@@ -3,13 +3,13 @@
 namespace App\Models;
 
 use App\Enums\TaskStatusEnum;
+use App\Events\Tasks\TaskUpdated;
 use App\Models\Traits\AddOwnerTrait;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class Task extends Model
@@ -27,6 +27,11 @@ class Task extends Model
     ];
 
 
+    protected $casts = [
+        'deadline' => 'datetime',
+        'status' => TaskStatusEnum::class
+    ];
+
 
 
 
@@ -36,10 +41,31 @@ class Task extends Model
 //        static::addGlobalScope(self::SCOPE_AUTH, function(Builder $builder) {
 //            $builder->where('owner_id', Auth::user()->id ?? null);
 //        });
+
         static::addGlobalScope(self::SCOPE_ORDER, function (Builder $builder) {
             $builder->orderBy('created_at', 'DESC');
         });
     }
+
+    public static function booted():void
+    {
+        static::updated(function(Task $model){
+            TaskUpdated::dispatch($model);
+        });
+    }
+
+
+//    public function update(array $attributes = [], array $options = []): bool
+//    {
+//
+//        $returnValue = parent::update($attributes, $options);
+////        if ($returnValue) {
+////            dd($this->getDirty(), $this->getDirtyForUpdate());
+////            TaskUpdated::dispatch($this);
+////        }
+//        return $returnValue;
+//    }
+
 
 
     public function scopeForUser(\Illuminate\Contracts\Database\Eloquent\Builder $query, User $user)

@@ -23,7 +23,7 @@ class TaskResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'status' => $this->status,
-            'deadline' => $this->deadline,
+            'deadline' => $this->deadline->toIso8601String(),
 
             'owner' => new UserResource($this->whenLoaded('owner')),
             'project_id' => $this->project_id,
