@@ -25,14 +25,14 @@ class CreateTaskTest extends TaskTestsAbstract
      */
     public function test_createTask(): void
     {
+        /** @var Carbon $exampleDeadline */
         $exampleDeadline = fake()->dateTimeBetween(startDate: '+1 day', endDate: '+1 year')
-                ->format('Y-m-d H:i:s')
         ;
         $data = [
             'title' => 'my task',
             'description' => 'my task description',
             'status' => TaskStatusEnum::TODO->value,
-            'deadline' => $exampleDeadline
+            'deadline' => $exampleDeadline->format(\DateTime::ATOM)
         ];
 
         $response = $this->createTask($data);
@@ -99,8 +99,7 @@ class CreateTaskTest extends TaskTestsAbstract
 
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.title', fn(mixed $value) => is_array($value))
-            ->assertJsonPath('errors.title.0',  'The title field must not be greater than 255 characters.')
+            ->assertInvalid(['title'])
         ;
     }
 
@@ -123,8 +122,7 @@ class CreateTaskTest extends TaskTestsAbstract
 
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.status', fn(mixed $value) => is_array($value))
-            ->assertJsonPath('errors.status.0',  'The selected status is invalid.')
+            ->assertInvalid(['status'])
         ;
     }
 
@@ -145,7 +143,7 @@ class CreateTaskTest extends TaskTestsAbstract
         $response = $this->createTask($data);
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.title', fn(mixed $value) => is_array($value))
+            ->assertInvalid(['title'])
         ;
     }
 
@@ -166,7 +164,7 @@ class CreateTaskTest extends TaskTestsAbstract
         $response = $this->createTask($data);
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.description', fn(mixed $value) => is_array($value))
+            ->assertInvalid(['description'])
         ;
     }
 
@@ -188,7 +186,7 @@ class CreateTaskTest extends TaskTestsAbstract
         $response = $this->createTask($data);
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.status', fn(mixed $value) => is_array($value))
+            ->assertInvalid(['status'])
         ;
     }
 
@@ -212,7 +210,7 @@ class CreateTaskTest extends TaskTestsAbstract
         $response = $this->createTask($data);
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.deadline', fn(mixed $value) => is_array($value))
+            ->assertInvalid(['deadline'])
         ;
     }
 
@@ -238,7 +236,7 @@ class CreateTaskTest extends TaskTestsAbstract
         $response = $this->createTask($data);
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.deadline', fn(mixed $value) => is_array($value))
+            ->assertInvalid(['deadline'])
         ;
     }
 

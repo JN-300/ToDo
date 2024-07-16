@@ -15,8 +15,16 @@ class TaskSeeder extends Seeder
      */
     public function run(): void
     {
-        Task::factory(100)
-            ->withRandomDate()
+        // create 10 overdue
+        Task::factory(10)
+            ->withRandomDeadline(endDate: '-1 second')
+            ->withOneOfGivenProjects(Project::all())
+            ->withOneOfGivenOwner(User::all())
+            ->create();
+
+        // create 10 overdue
+        Task::factory(20)
+            ->withRandomDeadline(startDate: '+1 week')
             ->withOneOfGivenProjects(Project::all())
             ->withOneOfGivenOwner(User::all())
             ->create();
