@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Enums\TaskStatusEnum;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class UpdateTaskRequest extends FormRequest
@@ -27,7 +28,7 @@ class UpdateTaskRequest extends FormRequest
         $minDate = Carbon::now()
             ->modify('+ 30minutes')
             ->format('Y-m-d H:i:s');
-        return [
+        $rules =  [
             'title' => [
                 'sometimes',
                 'required',
@@ -42,8 +43,7 @@ class UpdateTaskRequest extends FormRequest
             'deadline' => [
                 'sometimes',
                 'required',
-                'date',
-                'after:'.$minDate
+                'date'
             ],
             'status' => [
                 'sometimes',
@@ -51,5 +51,11 @@ class UpdateTaskRequest extends FormRequest
                 Rule::enum(TaskStatusEnum::class)
             ],
         ];
+
+        if (!Auth::user()->isAdmin()){
+            $rules['deadline'][] = 'after:'.$minDate;
+        }
+
+        return $rules;
     }
 }

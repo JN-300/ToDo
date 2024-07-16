@@ -11,15 +11,20 @@ use App\Notifications\SendOverdueStatusMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Response;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class TasKNotificationTest extends TestCase
 {
     use RefreshDatabase;
+
     /**
-     * A basic feature test example.
+     * Integration test to check if an update trigger an event
+     * and also the event listener is registered
+     * @return void
      */
     public function test_taskUpdateShouldBeTriggerAnEvent(): void
     {
@@ -41,9 +46,12 @@ class TasKNotificationTest extends TestCase
         Event::assertListening(TaskUpdated::class, SendOverdueTaskNotification::class);
     }
 
+    /**
+     * Integration test Motification will dispatch if task updated with a deadline lower now
+     * @return void
+     */
     public function test_taskUpdateWithOverdueDeadlineShouldTriggerANotification()
     {
-//        Event::fake(TaskUpdated::class);
         Notification::fake();
         $owner = User::factory()->create();
         $admin = User::factory()->create(['admin' => true]);
@@ -52,22 +60,21 @@ class TasKNotificationTest extends TestCase
             ->withRandomDeadline(endDate: '-1 second')
             ->create(['status' => TaskStatusEnum::TODO])
         ;
-
-        $this->assertEquals($task->status, TaskStatusEnum::TODO);
-
         $this
             ->actingAs($admin)
             ->patchJson('api/tasks/'.$task->id, ['title' => 'test'])
             ->assertStatus(Response::HTTP_OK)
         ;
         Notification::assertSentTo($owner, SendOverdueStatusMail::class);
-
     }
 
 
+    /**
+     * Integration test that no notification dispatched if task updated with a deadline greater/equal now
+     * @return void
+     */
     public function test_taskUpdateWithFutureDeadlineShouldNotTriggerANotification()
     {
-//        Event::fake(TaskUpdated::class);
         Notification::fake();
         $owner = User::factory()->create();
         $admin = User::factory()->create(['admin' => true]);
@@ -76,9 +83,6 @@ class TasKNotificationTest extends TestCase
             ->withRandomDeadline(startDate: '+30 second')
             ->create(['status' => TaskStatusEnum::TODO])
         ;
-
-        $this->assertEquals($task->status, TaskStatusEnum::TODO);
-
         $this
             ->actingAs($admin)
             ->patchJson('api/tasks/'.$task->id, ['title' => 'test'])
@@ -88,9 +92,13 @@ class TasKNotificationTest extends TestCase
 
     }
 
+    /**
+     * Integration test that no notification dispatched if task updated with a deadline lower  now
+     * and a DONE status
+     * @return void
+     */
     public function test_taskUpdateWithOverdueDeadlineShouldNotTriggerANotificationIfStatusIsDone()
     {
-//        Event::fake(TaskUpdated::class);
         Notification::fake();
         $owner = User::factory()->create();
         $admin = User::factory()->create(['admin' => true]);
@@ -99,15 +107,11 @@ class TasKNotificationTest extends TestCase
             ->withRandomDeadline(endDate: '-1 second')
             ->create(['status' => TaskStatusEnum::DONE])
         ;
-
-        $this->assertEquals($task->status, TaskStatusEnum::DONE);
-
         $this
             ->actingAs($admin)
             ->patchJson('api/tasks/'.$task->id, ['title' => 'test'])
             ->assertStatus(Response::HTTP_OK)
         ;
         Notification::assertNotSentTo($owner, SendOverdueStatusMail::class);
-
     }
 }

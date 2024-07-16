@@ -185,7 +185,6 @@ class ReadTest extends TestCase
                 ->query($url, $query)
             ;
         }
-        print $url.PHP_EOL;
         return $this->getJson($url);
     }
 }

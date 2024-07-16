@@ -36,6 +36,7 @@ class SendOverdueStatusMail extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
+                    ->subject('Aufgabe wurde durch einen Admin bearbeitet')
                     ->line('Deine Aufgabe:')
                     ->line('### '.$this->task->title)
                     ->line('wurde von einem Admin bearbeitet, obwohl die Deadline bereits überschritten ist!')

@@ -8,7 +8,6 @@ use App\Events\Tasks\TaskUpdated;
 use App\Models\User;
 use App\Notifications\SendOverdueStatusMail;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 
 class SendOverdueTaskNotification
 {
