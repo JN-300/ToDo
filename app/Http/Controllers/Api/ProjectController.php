@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FilterProjectRequest;
+use App\Http\Requests\FilterTaskRequest;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectCollection;
 use App\Http\Resources\ProjectResource;
 use App\Models\Project;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 
@@ -23,20 +26,15 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index():ProjectCollection
+    public function index(FilterProjectRequest $request):ProjectCollection
     {
-        $projects = Project::all();
-
-        // TODO: Create as FilterRequest with configurable 'with' params
-        if (request()->query->has('with')) {
-            $loadRelations = request()->query('with');
-            if (!is_array($loadRelations))
-            {
-                $loadRelations = explode(',', $loadRelations);
-            }
-            $loadRelations = array_filter($loadRelations, fn($item) => $item == 'tasks');
-            $projects->load($loadRelations);
-        }
+        $projects = Project::query()
+            ->when($request->has('with'), fn(Builder $builder) => $builder->with($request->with))
+        ;
+        $projects = ($request->has('limit')
+            ? $projects->paginate($request->limit)
+            : $projects->get())
+        ;
 
         return new ProjectCollection($projects);
     }
@@ -58,16 +56,11 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project):ProjectResource
+    public function show(FilterProjectRequest $request, Project $project):ProjectResource
     {
-        if (request()->query->has('with')) {
-            $loadRelations = request()->query('with');
-            if (!is_array($loadRelations))
-            {
-                $loadRelations = explode(',', $loadRelations);
-            }
-            $loadRelations = array_filter($loadRelations, fn($item) => $item == 'tasks');
-            $project->load($loadRelations);
+
+        if ($request->has('with')) {
+            $project->load($request->with);
         }
         return new ProjectResource($project);
     }

@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class FilterTaskRequest extends FormRequest
+class FilterProjectRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,6 +14,7 @@ class FilterTaskRequest extends FormRequest
     {
         return true;
     }
+
 
     protected function prepareForValidation()
     {
@@ -37,22 +38,11 @@ class FilterTaskRequest extends FormRequest
      */
     public function rules(): array
     {
+
         return [
-            'filter' => 'sometimes|array',
-            'filter.overdue' => 'sometimes|boolean',
-            'filter.users' => 'sometimes|array',
-            'filter.users.*' => [
-                'sometimes',
-                Rule::exists('users', 'id')
-            ],
-            'filter.projects' => 'sometimes|array',
-            'filter.projects.*' => [
-                'sometimes',
-                'uuid',
-                Rule::exists('projects', 'id')
-            ],
+            'limit' => 'sometimes|integer',
             'with' => 'sometimes|array',
-            'with.*' => Rule::in(['project','owner'])
+            'with.*' => Rule::in(['tasks'])
         ];
     }
 }

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FilterTaskRequest;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskCollection;
 use App\Http\Resources\TaskResource;
 use App\Models\Task;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Support\Facades\Auth;
@@ -24,19 +26,18 @@ class TaskController extends Controller
     /**
      * @return TaskCollection
      */
-    public function index():TaskCollection
+    public function index(FilterTaskRequest $request):TaskCollection
     {
-        $tasks = Task::forUser(Auth::user())->get();
-        // TODO: Create as FilterRequest with configurable 'with' params
-        if (request()->query->has('with')) {
-            $loadRelations = request()->query('with');
-            if (!is_array($loadRelations))
-            {
-                $loadRelations = explode(',', $loadRelations);
-            }
-            $loadRelations = array_filter($loadRelations, fn($item) => $item == 'project');
-            $tasks->load($loadRelations);
-        }
+        $tasks = Task::query()
+            ->when(isset($request->filter['overdue']), fn(Builder $builder) => $builder->overdue($request->filter['overdue']))
+            ->when($request->has('with'), fn(Builder $builder)  => $builder->with($request->with))
+            ->forUser(Auth::user())
+        ;
+
+        $tasks = ($request->has('limit')
+            ? $tasks->paginate($request->limit)
+            : $tasks->get())
+        ;
 
         return new TaskCollection($tasks);
     }
@@ -60,9 +61,11 @@ class TaskController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Task $task):TaskResource
+    public function show(FilterTaskRequest $request, Task $task):TaskResource
     {
-        $task->load('project');
+        if ($request->has('with')) {
+            $task->load($request->with);
+        }
         return new TaskResource($task);
     }
 

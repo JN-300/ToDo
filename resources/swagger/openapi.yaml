@@ -1,0 +1,645 @@
+openapi: 3.0.3
+info:
+  title: API overview for simple task management
+  version: 2.0.0
+  contact:
+    name: JN
+servers:
+  - url: https://todo.ddev.site/api
+security:
+  - bearerAuth: []
+paths:
+  "/api/token":
+    post:
+      security: []
+      tags:
+        - auth
+      description: Create api token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Create api token request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    format: string
+    delete:
+      tags:
+        - auth
+      description: Delete token
+      responses:
+        200:
+          description: Logout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+
+
+  "/api/projects":
+    get:
+      tags:
+        - Projects
+      description: List all projects
+      parameters:
+
+        - in: query
+          name: with[]
+          description: enrich with project and/or owner
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                  - tasks
+
+        - in: query
+          name: limit
+          description: enrich with project and/or owner
+          content:
+            application/json:
+              schema:
+                type: integer
+      responses:
+        '200':
+          description: Project Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/ProjectResource"
+    post:
+      tags:
+        - Projects
+      summary: add new project
+      description: Create a project
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectRequest"
+      responses:
+        '200':
+          description: Project Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ProjectResource"
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: Successfully created project
+
+  "/api/projects/{projectId}":
+    get:
+      tags:
+        - Projects
+      summary: find a project
+      parameters:
+        - projectId:
+          name: projectId
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ProjectResource"
+    patch:
+      tags:
+        - Projects
+      summary: find a project
+      parameters:
+        - projectId:
+          name: projectId
+          in: path
+          required: true
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectRequest"
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/ProjectResource"
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: Successfully updated project
+    delete:
+      tags:
+        - Projects
+      summary: Remove a project
+      parameters:
+        - projectId:
+          name: projectId
+          in: path
+          required: true
+          type: string
+          format: uuid
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: Successfully deleted project
+
+
+  "/api/tasks":
+    get:
+      tags:
+        - Tasks
+      description: List all tasks
+      parameters:
+        - in: query
+          name: filter[overdue]
+          content:
+            application/json:
+              schema:
+                type: integer
+                enum:
+                  - 0
+                  - 1
+        - in: query
+          name: filter[projects][]
+          content:
+            application/json:
+              schema:
+                type: string
+
+        - in: query
+          name: with[]
+          description: enrich with project and/or owner
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                  - project
+                  - owner
+
+        - in: query
+          name: limit
+          description: enrich with project and/or owner
+          content:
+            application/json:
+              schema:
+                type: integer
+      responses:
+        '200':
+          description: Task Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/TaskResource"
+    post:
+      tags:
+        - Tasks
+      summary: add new task
+      description: Create a task
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskRequest"
+      responses:
+        '200':
+          description: Task Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/TaskResource"
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: Successfully created project
+
+  "/api/tasks/{taskId}":
+    get:
+      tags:
+        - Tasks
+      summary: find a task
+      parameters:
+        - taskId:
+          name: taskId
+          in: path
+          required: true
+          type: string
+
+        - in: query
+          name: with[]
+          description: enrich with project and/or owner
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                  - project
+                  - owner
+
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/TaskResource"
+    patch:
+      tags:
+        - Tasks
+      summary: find a task
+      parameters:
+        - taskId:
+          name: taskId
+          in: path
+          required: true
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskRequest"
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/TaskResource"
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: Successfully updated task
+    delete:
+      tags:
+        - Tasks
+      summary: Remove a task
+      parameters:
+        - taskId:
+          name: taskId
+          in: path
+          required: true
+          type: string
+          format: uuid
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: Successfully deleted task
+
+
+  "/api/admin/tasks":
+    get:
+      tags:
+        - Admin
+      description: List all tasks
+      parameters:
+        - in: query
+          name: filter[overdue]
+          content:
+            application/json:
+              schema:
+                type: integer
+                enum:
+                  - 0
+                  - 1
+
+        - in: query
+          name: filter[users][]
+          content:
+            application/json:
+              schema:
+                type: string
+        - in: query
+          name: filter[projects][]
+          content:
+            application/json:
+              schema:
+                type: string
+
+        - in: query
+          name: with[]
+          description: enrich with project and/or owner
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                  - project
+                  - owner
+
+        - in: query
+          name: limit
+          description: enrich with project and/or owner
+          content:
+            application/json:
+              schema:
+                type: integer
+      responses:
+        '200':
+          description: Task Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      "$ref": "#/components/schemas/TaskResource"
+        422:
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  "/api/admin/tasks/{taskId}":
+    get:
+      tags:
+        - Admin
+      summary: find a task
+      parameters:
+        - taskId:
+          name: taskId
+          in: path
+          required: true
+          type: string
+
+        - in: query
+          name: with[]
+          description: enrich with project and/or owner
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                  - project
+                  - owner
+
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/TaskResource"
+    patch:
+      tags:
+        - Admin
+      summary: find a task
+      parameters:
+        - taskId:
+          name: taskId
+          in: path
+          required: true
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskRequest"
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/TaskResource"
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: Successfully updated task
+    delete:
+      tags:
+        - Admin
+      summary: Remove a task
+      parameters:
+        - taskId:
+          name: taskId
+          in: path
+          required: true
+          type: string
+          format: uuid
+      responses:
+        200:
+          description:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                    example: Successfully deleted task
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      name: bearerAuth
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UserResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+
+    TaskResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+            - to_do
+            - in_progress
+            - done
+        deadline:
+          type: string
+          format: DateTime
+          pattern: YYYY-MM-DD H:i:s
+        owner_id:
+          type: integer
+          format: int62
+        owner:
+          $ref: '#/components/schemas/UserResource'
+
+        project_id:
+          type: string
+          format: uuid
+        project:
+          $ref: '#/components/schemas/ProjectResource'
+
+
+        created_at:
+          type: string
+          format: DateTime
+          pattern: YYYY-MM-DD H:i:s
+        updated_at:
+          type: string
+          format: DateTime
+          pattern: YYYY-MM-DD H:i:s
+
+    TaskRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+          enum:
+            - to_do
+            - in_progress
+            - done
+        deadline:
+          type: string
+          format: DateTime
+          pattern: YYYY-MM-DD H:i:s
+        owner_id:
+          type: integer
+          format: int62
+
+        project_id:
+          type: string
+          format: uuid
+
+    ProjectResource:
+        type: object
+        required:
+          - id
+        properties:
+          id:
+            type: string
+            format: uuid
+          title:
+            format: string
+          created_at:
+            type: string
+            format: DateTime
+            pattern: YYYY-MM-DD H:i:s
+
+          updated_at:
+            type: string
+            format: DateTime
+            pattern: YYYY-MM-DD H:i:s
+
+    ProjectRequest:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+

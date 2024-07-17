@@ -27,17 +27,26 @@ class TaskController extends Controller
      */
     public function index(FilterTaskRequest $request):TaskCollection
     {
-        $tasks = \App\Models\Task::with(['owner:id,name', 'project'])
+        $tasks = \App\Models\Task::query()
+            ->when($request->has('with'), fn(Builder $builder)  => $builder->with($request->with))
             ->when(isset($request->filter['users']), fn(Builder $builder) => $builder->forUserIds(...$request->filter['users']))
             ->when(isset($request->filter['projects']), fn(Builder $builder) => $builder->forProjectIds(...$request->filter['projects']))
             ->when(isset($request->filter['overdue']), fn(Builder $builder) => $builder->overdue($request->filter['overdue']))
         ;
 
-        return new TaskCollection($tasks->get());
+        $tasks = ($request->has('limit')
+            ? $tasks->paginate($request->limit)
+            : $tasks->get())
+        ;
+
+        return new TaskCollection($tasks);
     }
 
-    public function show(Task $task):TaskResource
+    public function show(FilterTaskRequest $request, Task $task):TaskResource
     {
+        if ($request->has('with')) {
+            $task->load($request->with);
+        }
         return new TaskResource($task);
     }
 

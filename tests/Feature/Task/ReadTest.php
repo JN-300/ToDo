@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Task;
 
+use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -102,6 +103,8 @@ class ReadTest extends TaskTestsAbstract
         ;
     }
 
+
+
     /**
      * Testing a authenticated user cannot show task detail of a task of another user
      *
@@ -138,16 +141,22 @@ class ReadTest extends TaskTestsAbstract
 
     /* -------------------------------------------------------------------------------------------------------------- */
 
-
-    private function readTasks(?Task $task = null, ?User $user = null):TestResponse
+    private function readTasks(?Task $task = null, ?User $user = null, ?array $query = null):TestResponse
     {
         $user = $user ?? User::factory()->create();
-        Sanctum::actingAs($user);
 
-        return ($task)
-            ? $this->getJson('api/tasks/'.$task->id)
-            : $this->getJson('api/tasks')
+        $url =  ($task)
+            ? sprintf('/api/tasks/%s', $task->id)
+            : '/api/tasks'
+        ;
+
+        if ($query) {
+            $url = url()
+                ->query($url, $query)
             ;
-
+        }
+        return $this
+            ->actingAs($user)
+            ->getJson($url);
     }
 }

@@ -36,9 +36,10 @@ class TaskTest extends TestCase
             ->create();
         $this->showTasksAsAuthenticateUser(task: $task, user: $owner)
             ->assertStatus(Response::HTTP_OK)
-            ->assertJsonPath('data.project.id', $project->id)
+            ->assertJsonPath('data.project_id', $project->id)
             ;
     }
+
 
     /**
      * Testing that a task can be create with a project relation through api call
@@ -92,6 +93,19 @@ class TaskTest extends TestCase
             ;
     }
 
+
+    public function test_showSingleTaskWithEnrichedProject():void
+    {
+
+        $owner      = User::factory()->create();
+        $project    = Project::factory()->create();
+        $task       = Task::factory()->withOwner($owner)->withProject($project)->create();
+        $this->showTasksAsAuthenticateUser(task: $task, user: $owner, query: ['with' => 'project'])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJsonPath('data.project.id', $project->id)
+        ;
+    }
+
     /**
      * Testing route calling with query param with:project returns also full project data in response
      *
@@ -113,7 +127,7 @@ class TaskTest extends TestCase
             ->create()
         ;
 
-        $response = $this->showTasksAsAuthenticateUser(query: ['with' => 'project'], user: $owner)
+         $this->showTasksAsAuthenticateUser(query: ['with' => 'project'], user: $owner)
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonCount(10, 'data')
             ->assertJsonPath('data.0.project.id', fn(mixed $value) => \Illuminate\Support\Str::isUuid($value))

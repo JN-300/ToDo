@@ -42,7 +42,7 @@ class ReadTest extends TestCase
     }
 
 
-    public function test_listSingleTask():void
+    public function test_showSingleTask():void
     {
         $admin = User::factory()->create(['admin' => true]);
         $owner = User::factory()->create();
@@ -53,6 +53,37 @@ class ReadTest extends TestCase
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonPath('data.title', $task->title)
             ;
+    }
+
+    public function test_showSingleTaskWithEnrichedOwner():void
+    {
+        $admin      = User::factory()->create(['admin' => true]);
+        $owner      = User::factory()->create();
+        $project    = Project::factory()->create();
+        $task = Task::factory()
+            ->withOwner($owner)
+            ->withProject($project)
+            ->create(['status' => TaskStatusEnum::IN_PROGRESS]);
+        $this->readTasks(task: $task, user: $admin, query: ['with' => 'owner'])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJsonPath('data.owner.id', $owner->id)
+        ;
+    }
+
+
+    public function test_showSingleTaskWithEnrichedProject():void
+    {
+        $admin      = User::factory()->create(['admin' => true]);
+        $owner      = User::factory()->create();
+        $project    = Project::factory()->create();
+        $task = Task::factory()
+            ->withOwner($owner)
+            ->withProject($project)
+            ->create(['status' => TaskStatusEnum::IN_PROGRESS]);
+        $this->readTasks(task: $task, user: $admin, query: ['with' => 'project'])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJsonPath('data.project.id', $project->id)
+        ;
     }
     /**
      * Counter-test no admins could not list all tasks
@@ -165,6 +196,21 @@ class ReadTest extends TestCase
         $this->readTasks(user: $admin, query: ['filter' => ['overdue' => true]])
             ->assertStatus(Response::HTTP_OK)
             ->assertJsonCount($taskCount, 'data')
+        ;
+    }
+
+    public function test_listTasksWithLimit():void
+    {
+        Task::factory(100)
+            ->withOneOfGivenOwner(User::factory(20)->create())
+            ->withOneOfGivenProjects(Project::factory(10)->create())
+            ->withRandomDeadline(startDate: '+30 minutes')
+            ->create(['status' => TaskStatusEnum::DONE])
+        ;
+
+        $this->readTasks(user: User::factory()->create(['admin' => true]), query: ['limit' => 2])
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJsonCount(2, 'data')
         ;
     }
 
