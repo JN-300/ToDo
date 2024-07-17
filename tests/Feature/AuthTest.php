@@ -96,7 +96,7 @@ class AuthTest extends TestCase
     }
 
     /**
-     * Test to check for correct http status after attempt to receive an user detail with right bearer token
+     * Test to check for correct http status after attempt to receive the user details with correct bearer token
      * @return void
      */
     public function test_couldShowUserDetailsWithGenerateToken(): void

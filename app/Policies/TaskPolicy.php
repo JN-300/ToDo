@@ -4,10 +4,20 @@ namespace App\Policies;
 
 use App\Models\Task;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\Response;
 
 class TaskPolicy
 {
+
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->isAdmin())
+        {
+            return true;
+        }
+        return null;
+    }
     /**
      * Determine whether the user can view any models.
      */
@@ -19,12 +29,20 @@ class TaskPolicy
             ;
     }
 
+    public function viewAnyOfOtherUser(User $user, User $otherUser): Response
+    {
+        return $user && $otherUser->id === $user->id
+            ? Response::allow()
+            : Response::deny()
+            ;
+    }
+
     /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Task $task): Response
     {
-        return $user
+        return ($user && $task->owner->id === $user->id)
             ? Response::allow()
             : Response::deny()
             ;
@@ -46,8 +64,12 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): Response
     {
-        return $user
-            ? Response::allow()
+        $now = Carbon::now();
+        return ($user && $task->owner->id === $user->id)
+            ? (($task->deadline > $now)
+                ? Response::allow()
+                : Response::deny('Update of overdue tasks not allowed.')
+            )
             : Response::deny()
             ;
     }
@@ -57,7 +79,7 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): Response
     {
-        return $user
+        return ($user && $task->owner->id === $user->id)
             ? Response::allow()
             : Response::deny()
             ;

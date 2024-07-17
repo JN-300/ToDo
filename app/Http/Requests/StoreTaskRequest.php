@@ -28,9 +28,16 @@ class StoreTaskRequest extends FormRequest
             'title' =>[
                 'required',
                 'string',
-                'max:255'],
+                'max:255'
+            ],
             'description' => [
                 'required'
+            ],
+            'deadline' => [
+                'required',
+                'date',
+                'after:now'
+
             ],
             'status' => [
                 'required',

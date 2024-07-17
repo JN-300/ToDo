@@ -1,0 +1,821 @@
+{
+    "_type": "export",
+    "__export_format": 4,
+    "__export_date": "2024-07-17T16:53:57.048Z",
+    "__export_source": "insomnia.desktop.app:v9.3.2",
+    "resources": [
+        {
+            "_id": "req_279db39ec84d492698a7b7b6cebd514b",
+            "parentId": "fld_bcfc23b3b4a14c13a1030ac27f5ba62d",
+            "modified": 1720544900151,
+            "created": 1720257922922,
+            "url": "{{ _.api_base }}/user",
+            "name": "Show current logged in user",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [],
+            "headers": [
+                {
+                    "id": "pair_9934348f03eb4846953d4cea608ee88f",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "description": "",
+                    "disabled": false
+                },
+                {
+                    "id": "pair_a88e9a8f363240d78387084d32c58ae2",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": "",
+                    "disabled": false
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542540746,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "fld_bcfc23b3b4a14c13a1030ac27f5ba62d",
+            "parentId": "fld_9bf0296d06974d67b1f9eb3bed6a64dc",
+            "modified": 1721218727670,
+            "created": 1720542534234,
+            "name": "1: Auth",
+            "description": "",
+            "environment": {},
+            "environmentPropertyOrder": null,
+            "metaSortKey": -1720542568175,
+            "_type": "request_group"
+        },
+        {
+            "_id": "fld_9bf0296d06974d67b1f9eb3bed6a64dc",
+            "parentId": "wrk_scratchpad",
+            "modified": 1721219579666,
+            "created": 1720257747542,
+            "name": "toDo",
+            "description": "",
+            "environment": {
+                "api_base": "https://todo.ddev.site/api",
+                "tasks": {
+                    "current_uuid": false
+                }
+            },
+            "environmentPropertyOrder": {
+                "&": [
+                    "api_base",
+                    "tasks"
+                ],
+                "&~|tasks": [
+                    "current_uuid"
+                ]
+            },
+            "metaSortKey": -1720257747542,
+            "authentication": {
+                "type": "none"
+            },
+            "_type": "request_group"
+        },
+        {
+            "_id": "wrk_scratchpad",
+            "parentId": null,
+            "modified": 1701165863947,
+            "created": 1701165863947,
+            "name": "Scratch Pad",
+            "description": "",
+            "scope": "collection",
+            "_type": "workspace"
+        },
+        {
+            "_id": "req_428ffe9e8a0447d0abccd4e31d791921",
+            "parentId": "fld_bcfc23b3b4a14c13a1030ac27f5ba62d",
+            "modified": 1720886193176,
+            "created": 1720257751775,
+            "url": "{{ _.api_base }}/token",
+            "name": "Login",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"email\": \"jeffrey@nellissen.net\",\n\t\"password\": \"password\"\n\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "id": "pair_0bdcc92044a54482aae6b5909307a4d6",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1720542540696,
+            "isPrivate": false,
+            "pathParameters": [],
+            "afterResponseScript": "const jsonBody = insomnia.response.json();\ninsomnia.environment.set(\"auth_token\", jsonBody.access_token);\n",
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_308418fc46bb4257acda0c3c91fe3db5",
+            "parentId": "fld_bcfc23b3b4a14c13a1030ac27f5ba62d",
+            "modified": 1720544867007,
+            "created": 1720259623010,
+            "url": "{{ _.api_base }}/token",
+            "name": "Logout",
+            "description": "",
+            "method": "DELETE",
+            "body": {},
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "accept",
+                    "value": "Application/json",
+                    "id": "pair_1828983f3afb479382300087900e78db"
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542540646,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_d4e78aa4419240cca60eb48224651185",
+            "parentId": "fld_5eb9e112d3a940638d19545310f232cd",
+            "modified": 1720886206823,
+            "created": 1720886031387,
+            "url": "{{ _.api_base }}/projects",
+            "name": "Create project",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"title\": \"My first project\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "id": "pair_5d05277e58ac4d1a9db498287d07efc1",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542577405,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "fld_5eb9e112d3a940638d19545310f232cd",
+            "parentId": "fld_9bf0296d06974d67b1f9eb3bed6a64dc",
+            "modified": 1721218576637,
+            "created": 1720886031384,
+            "name": "2: Project",
+            "description": "",
+            "environment": {},
+            "environmentPropertyOrder": null,
+            "metaSortKey": -1720542568125,
+            "_type": "request_group"
+        },
+        {
+            "_id": "req_6b83f23befc740fa8444d4c9ec828785",
+            "parentId": "fld_5eb9e112d3a940638d19545310f232cd",
+            "modified": 1721234974244,
+            "created": 1720886031385,
+            "url": "{{ _.api_base }}/projects",
+            "name": "List projects",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [
+                {
+                    "id": "pair_639c7495a3784704b5cd625d36da01f4",
+                    "name": "with",
+                    "value": "tasks",
+                    "description": "",
+                    "disabled": false
+                },
+                {
+                    "id": "pair_54605e630d3b4d9a9c50847f2ab9002c",
+                    "name": "page",
+                    "value": "3",
+                    "description": "",
+                    "disabled": false
+                },
+                {
+                    "id": "pair_9f67e25d36c2412984b5b9a45e2c7dcb",
+                    "name": "limit",
+                    "value": "1",
+                    "description": "",
+                    "disabled": false
+                }
+            ],
+            "headers": [
+                {
+                    "id": "pair_5d05277e58ac4d1a9db498287d07efc1",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                },
+                {
+                    "id": "pair_1b39e8ba815c4bb88cf86d2887bd5b14",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542577305,
+            "isPrivate": false,
+            "pathParameters": [],
+            "afterResponseScript": "const jsonBody = insomnia.response.json();\nconst statusCode = insomnia.response.code;\n\nif(statusCode == 200) \n{\n\tinsomnia.environment.set(\"example_project_id\", jsonBody.data[0].id);\n}",
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_f08092cd238a4a61805770ae8453df7c",
+            "parentId": "fld_5eb9e112d3a940638d19545310f232cd",
+            "modified": 1721235039316,
+            "created": 1720886031386,
+            "url": "{{ _.api_base }}/projects/{{ _.example_project_id }}",
+            "name": "Show project - use the first found uuid from list request as env var ",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [
+                {
+                    "id": "pair_05f7731920d740ce981e1632ae44c825",
+                    "name": "with",
+                    "value": "tasks",
+                    "description": "",
+                    "disabled": false
+                }
+            ],
+            "headers": [
+                {
+                    "id": "pair_5d05277e58ac4d1a9db498287d07efc1",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                },
+                {
+                    "id": "pair_1b39e8ba815c4bb88cf86d2887bd5b14",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542559025.5,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_6b50b6194a7449a1adbaf3ee5ce328cc",
+            "parentId": "fld_5eb9e112d3a940638d19545310f232cd",
+            "modified": 1721235093513,
+            "created": 1720886031386,
+            "url": "{{ _.api_base }}/projects/{{ _.example_project_id }} ",
+            "name": "Update project - use the first found uuid from list request as env var ",
+            "description": "",
+            "method": "PATCH",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"title\": \"my new project title\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "id": "pair_5d05277e58ac4d1a9db498287d07efc1",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542549885.75,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_717ba1c49bc7489dbf6d3bae31685b33",
+            "parentId": "fld_5eb9e112d3a940638d19545310f232cd",
+            "modified": 1721235113697,
+            "created": 1720886031386,
+            "url": "{{ _.api_base }}/projects/{{ _.example_project_id }}",
+            "name": "Delete project - use the first found uuid from list request as env var ",
+            "description": "",
+            "method": "DELETE",
+            "body": {
+                "mimeType": "application/json",
+                "text": ""
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "id": "pair_5d05277e58ac4d1a9db498287d07efc1",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542545315.875,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_deaf45e5c07c4c1b9fc4362f49de3e75",
+            "parentId": "fld_ea586d8ec815475487b76646a2c83724",
+            "modified": 1721218897588,
+            "created": 1720544418380,
+            "url": "{{ _.api_base }}/tasks",
+            "name": "Create task ",
+            "description": "",
+            "method": "POST",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"title\": \"My second admin task\",\n\t\"description\": \"CREATE: my example description\",\n\t\"status\": \"to_do\",\n\t\"deadline\": \"2024-07-31\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "id": "pair_5d05277e58ac4d1a9db498287d07efc1",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542577605,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "fld_ea586d8ec815475487b76646a2c83724",
+            "parentId": "fld_9bf0296d06974d67b1f9eb3bed6a64dc",
+            "modified": 1721219292125,
+            "created": 1720542568075,
+            "name": "3: Tasks",
+            "description": "",
+            "environment": {},
+            "environmentPropertyOrder": {},
+            "metaSortKey": -1720542568112.5,
+            "_type": "request_group"
+        },
+        {
+            "_id": "req_746fa29504494fa4aa0e8886b6ac2676",
+            "parentId": "fld_ea586d8ec815475487b76646a2c83724",
+            "modified": 1721235142665,
+            "created": 1720542577305,
+            "url": "{{ _.api_base }}/tasks",
+            "name": "List tasks",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [
+                {
+                    "id": "pair_9591093f45794b02b3fd366e30e03c9e",
+                    "name": "with",
+                    "value": "project, owner",
+                    "description": "",
+                    "disabled": true
+                }
+            ],
+            "headers": [
+                {
+                    "id": "pair_5d05277e58ac4d1a9db498287d07efc1",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                },
+                {
+                    "id": "pair_1b39e8ba815c4bb88cf86d2887bd5b14",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542577305,
+            "isPrivate": false,
+            "pathParameters": [],
+            "afterResponseScript": "const jsonBody \t\t= insomnia.response.json();\nconst statusCode \t= insomnia.response.code;\n\nif(statusCode == 200) \n{\n\t\tif (jsonBody.data) {\n\t\t\tinsomnia.environment.set(\"example_task_id\", jsonBody.data[0].id);\n\t\t}\n}",
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_6cde942c7975411792830efebc6e93cb",
+            "parentId": "fld_ea586d8ec815475487b76646a2c83724",
+            "modified": 1721220003245,
+            "created": 1720542757748,
+            "url": "{{ _.api_base }}/tasks/{{ _.example_task_id }} ",
+            "name": "Show task - use the first found uuid from list request as env var ",
+            "description": "",
+            "method": "GET",
+            "body": {},
+            "parameters": [],
+            "headers": [
+                {
+                    "id": "pair_5d05277e58ac4d1a9db498287d07efc1",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                },
+                {
+                    "id": "pair_1b39e8ba815c4bb88cf86d2887bd5b14",
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542559025.5,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_3023824a25fa4d2ca1b66cc41ee8100c",
+            "parentId": "fld_ea586d8ec815475487b76646a2c83724",
+            "modified": 1721220013260,
+            "created": 1720544251960,
+            "url": "{{ _.api_base }}/tasks/{{ _.example_task_id }} ",
+            "name": "Update task - use the first found uuid from list request as env var ",
+            "description": "",
+            "method": "PATCH",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"title\": \"my new task title\",\n\t\"description\": \"my example description\",\n\t\"status\": \"done\",\n\t\"project_id\": \"9c87b6c3-dd8f-48d2-a6ac-af33de438eaa\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "id": "pair_5d05277e58ac4d1a9db498287d07efc1",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542549885.75,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_57e91bcf7b224fe4a19407fe5bf972c8",
+            "parentId": "fld_ea586d8ec815475487b76646a2c83724",
+            "modified": 1720545923514,
+            "created": 1720544368209,
+            "url": "{{ _.api_base }}/tasks/{{ _.example_task.id }}",
+            "name": "Delete task - use the first found uuid from list request as env var ",
+            "description": "",
+            "method": "DELETE",
+            "body": {
+                "mimeType": "application/json",
+                "text": ""
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                },
+                {
+                    "id": "pair_5d05277e58ac4d1a9db498287d07efc1",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": ""
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1720542545315.875,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_060da56cb8904939bc55447de7dc5380",
+            "parentId": "fld_faeb9d0e6a684083a0c6045c378571e8",
+            "modified": 1721229805371,
+            "created": 1721066079385,
+            "url": "{{ _.api_base }}/admin/tasks",
+            "name": "List Tasks",
+            "description": "",
+            "method": "GET",
+            "body": {
+                "mimeType": "multipart/form-data",
+                "params": [
+                    {
+                        "name": "",
+                        "value": "",
+                        "id": "pair_e77a4bc91c544c8dabc9917646cf0cb3"
+                    }
+                ]
+            },
+            "parameters": [
+                {
+                    "id": "pair-empty",
+                    "name": "filter[overdue]",
+                    "value": "1",
+                    "description": "",
+                    "disabled": true
+                },
+                {
+                    "id": "pair_9eceaac231884f999a8456e9dc3a3ac0",
+                    "name": "filter[users][]",
+                    "value": "1",
+                    "description": "",
+                    "disabled": false
+                },
+                {
+                    "id": "pair_65c65a189aed4bda8f401c621da757b9",
+                    "name": "with[]",
+                    "value": "owner",
+                    "description": "",
+                    "disabled": false
+                },
+                {
+                    "id": "pair_0714203ae2724d91b4114ae207ba3e24",
+                    "name": "with[]",
+                    "value": "project",
+                    "description": "",
+                    "disabled": false
+                }
+            ],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "multipart/form-data",
+                    "id": "pair_1fb707dfcb4442fa8f10546679971c92"
+                },
+                {
+                    "id": "pair_1d89d6013e2440b5b902caca6cfcca18",
+                    "name": "Accept",
+                    "value": "application/json",
+                    "description": "",
+                    "disabled": false
+                }
+            ],
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "metaSortKey": -1721066055768,
+            "isPrivate": false,
+            "pathParameters": [],
+            "afterResponseScript": "const jsonBody \t\t= insomnia.response.json();\nconst statusCode \t= insomnia.response.code;\n\nif(statusCode == 200) \n{\n\t\tif (jsonBody.data) {\n\t\t\tinsomnia.environment.set(\"example_task_id\", jsonBody.data[0].id);\n\t\t}\n}",
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "fld_faeb9d0e6a684083a0c6045c378571e8",
+            "parentId": "fld_9bf0296d06974d67b1f9eb3bed6a64dc",
+            "modified": 1721218616382,
+            "created": 1721066048340,
+            "name": "4: Admin",
+            "description": "",
+            "environment": {},
+            "environmentPropertyOrder": null,
+            "metaSortKey": -1720542568100,
+            "authentication": {
+                "type": "bearer",
+                "token": "{{ _.auth_token }}"
+            },
+            "_type": "request_group"
+        },
+        {
+            "_id": "req_5c5684afac7b4ca8ad6487dfe86b8f03",
+            "parentId": "fld_faeb9d0e6a684083a0c6045c378571e8",
+            "modified": 1721229871005,
+            "created": 1721229832104,
+            "url": "{{ _.api_base }}/admin/tasks/{{ _.example_task_id }} ",
+            "name": "ShowTask",
+            "description": "",
+            "method": "GET",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"title\": \"my new p12roject title ewrwer 12123233\",\n\t\"deadline\": \"2023-07-01\"\n}"
+            },
+            "parameters": [
+                {
+                    "id": "pair_d951185ba0884f5284fb151dccb330c6",
+                    "name": "with",
+                    "value": "project,owner",
+                    "description": "",
+                    "disabled": false
+                }
+            ],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "id": "pair_d0c90938ca184be68efdb3a311caf832"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json",
+                    "id": "pair_fef4c8c0abf8463bb0c4c152b3ddb29c"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1721066055718,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        },
+        {
+            "_id": "req_854c66a7907a46d687f72fef0314dd7b",
+            "parentId": "fld_faeb9d0e6a684083a0c6045c378571e8",
+            "modified": 1721229815259,
+            "created": 1721066055868,
+            "url": "{{ _.api_base }}/admin/tasks/{{ _.example_task_id }} ",
+            "name": "UpdateTask",
+            "description": "",
+            "method": "PATCH",
+            "body": {
+                "mimeType": "application/json",
+                "text": "{\n\t\"title\": \"my new p12roject title ewrwer 12123233\",\n\t\"deadline\": \"2023-07-01\"\n}"
+            },
+            "parameters": [],
+            "headers": [
+                {
+                    "name": "Content-Type",
+                    "value": "application/json",
+                    "id": "pair_d0c90938ca184be68efdb3a311caf832"
+                },
+                {
+                    "name": "Accept",
+                    "value": "application/json",
+                    "id": "pair_fef4c8c0abf8463bb0c4c152b3ddb29c"
+                }
+            ],
+            "authentication": {},
+            "metaSortKey": -1721066055668,
+            "isPrivate": false,
+            "pathParameters": [],
+            "settingStoreCookies": true,
+            "settingSendCookies": true,
+            "settingDisableRenderRequestBody": false,
+            "settingEncodeUrl": true,
+            "settingRebuildPath": true,
+            "settingFollowRedirects": "global",
+            "_type": "request"
+        }
+    ]
+}

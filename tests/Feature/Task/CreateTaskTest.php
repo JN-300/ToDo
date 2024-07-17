@@ -4,6 +4,7 @@ namespace Tests\Feature\Task;
 
 use App\Enums\TaskStatusEnum;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\Response;
@@ -24,10 +25,14 @@ class CreateTaskTest extends TaskTestsAbstract
      */
     public function test_createTask(): void
     {
+        /** @var Carbon $exampleDeadline */
+        $exampleDeadline = fake()->dateTimeBetween(startDate: '+1 day', endDate: '+1 year')
+        ;
         $data = [
             'title' => 'my task',
             'description' => 'my task description',
             'status' => TaskStatusEnum::TODO->value,
+            'deadline' => $exampleDeadline->format(\DateTime::ATOM)
         ];
 
         $response = $this->createTask($data);
@@ -37,12 +42,13 @@ class CreateTaskTest extends TaskTestsAbstract
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.title', $data['title'])
             ->assertJsonPath('data.description', $data['description'])
+            ->assertJsonPath('data.deadline', $data['deadline'])
             ->assertJsonPath('data.status', $data['status'])
         ;
     }
 
     /**
-     * Testing that an unautheticated user cannot create a task
+     * Testing that an unauthenticated user cannot create a task
      * - HTTP Status should be 401
      * - Response should be message: Unauthenticated.
      *
@@ -93,8 +99,7 @@ class CreateTaskTest extends TaskTestsAbstract
 
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.title', fn(mixed $value) => is_array($value))
-            ->assertJsonPath('errors.title.0',  'The title field must not be greater than 255 characters.')
+            ->assertInvalid(['title'])
         ;
     }
 
@@ -117,8 +122,7 @@ class CreateTaskTest extends TaskTestsAbstract
 
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.status', fn(mixed $value) => is_array($value))
-            ->assertJsonPath('errors.status.0',  'The selected status is invalid.')
+            ->assertInvalid(['status'])
         ;
     }
 
@@ -139,7 +143,7 @@ class CreateTaskTest extends TaskTestsAbstract
         $response = $this->createTask($data);
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.title', fn(mixed $value) => is_array($value))
+            ->assertInvalid(['title'])
         ;
     }
 
@@ -160,7 +164,7 @@ class CreateTaskTest extends TaskTestsAbstract
         $response = $this->createTask($data);
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.description', fn(mixed $value) => is_array($value))
+            ->assertInvalid(['description'])
         ;
     }
 
@@ -182,7 +186,57 @@ class CreateTaskTest extends TaskTestsAbstract
         $response = $this->createTask($data);
         $response
             ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->assertJsonPath('errors.status', fn(mixed $value) => is_array($value))
+            ->assertInvalid(['status'])
+        ;
+    }
+
+
+
+
+    /**
+     * Testing an authenticated user cannot create a task without a deadline
+     * - HTTP Status should be 422
+     * - Response should have an array with main key errors and subarray with corresponding error messages for field status
+     *
+     * @return void
+     */
+    public function test_couldNotCreateTaskWithoutDeadline():void
+    {
+        $data = [
+            'title' => 'My title',
+            'description' => 'my task description',
+            'status' => TaskStatusEnum::TODO->value
+        ];
+        $response = $this->createTask($data);
+        $response
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertInvalid(['deadline'])
+        ;
+    }
+
+
+    /**
+     * Testing an authenticated user cannot create a task with a deadline lower then current time
+     * - HTTP Status should be 422
+     * - Response should have an array with main key errors and subarray with corresponding error messages for field status
+     *
+     * @return void
+     */
+    public function test_couldNotCreateTaskWithDeadlineLowerNow():void
+    {
+        $exampleDeadline = fake()->dateTime(max: '-1 second')
+            ->format('Y-m-d H:i:s')
+        ;
+        $data = [
+            'title' => 'My title',
+            'description' => 'my task description',
+            'status' => TaskStatusEnum::TODO->value,
+            'deadline' => $exampleDeadline
+        ];
+        $response = $this->createTask($data);
+        $response
+            ->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY)
+            ->assertInvalid(['deadline'])
         ;
     }
 
@@ -194,9 +248,9 @@ class CreateTaskTest extends TaskTestsAbstract
      * @param array $data
      * @return \Illuminate\Testing\TestResponse
      */
-    private function createTask(array $data): TestResponse
+    private function createTask(array $data, ?User $user = null): TestResponse
     {
-        $user = User::all()->first();
+        $user = $user ?? User::factory()->create();
         Sanctum::actingAs($user);
         return $this->postJson('/api/tasks/', $data);
     }
