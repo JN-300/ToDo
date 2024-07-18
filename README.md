@@ -27,10 +27,32 @@ $ ddev composer install
 $ ddev artisan key:generate
 $ ddev artisan migrate [--seed für Beispielnutzer und Testdatensätze]
 ```
+The seeders will generate:
+- 1 admin user with 
+  - email: admin@example.de 
+  - password: password
+
+- 1 fixed user with
+    - email: user@example.de
+    - password: password
+- 20 random user
+- 10 random projects
+- fixed set of 5 overdue tasks and 20 active tasks for fixed user
+- a random set of 20 overdue task and 100 active tasks for other users
+
 ## Testing
 ```console
 $ ddev artisan test
 ```
+
+For mailing tests there is also a mailpit available which catches all mails
+You can start i with
+```console
+$ ddev launch -m
+```
+Mails will only send in a running environment (not in unit tests)!<br>
+To test the notification, update a task with an overdue deadline and a status != **done** as admin.
+
 
 # API Routes
 ## -> [All information about the different API Routes](./documentation/api/index.md)

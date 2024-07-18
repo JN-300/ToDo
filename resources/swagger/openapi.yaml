@@ -66,7 +66,7 @@ paths:
 
         - in: query
           name: with[]
-          description: enrich with project and/or owner
+          description: enrich with tasks attended to the projects
           content:
             application/json:
               schema:
@@ -76,7 +76,7 @@ paths:
 
         - in: query
           name: limit
-          description: enrich with project and/or owner
+          description: add pagination and limit to given count
           content:
             application/json:
               schema:
@@ -131,6 +131,16 @@ paths:
           in: path
           required: true
           type: string
+
+        - in: query
+          name: with[]
+          description: enrich with tasks attended to the projects
+          content:
+            application/json:
+              schema:
+                type: string
+                enum:
+                  - tasks
       responses:
         200:
           description:
@@ -144,7 +154,7 @@ paths:
     patch:
       tags:
         - Projects
-      summary: find a project
+      summary: update given  project
       parameters:
         - projectId:
           name: projectId
@@ -233,7 +243,7 @@ paths:
 
         - in: query
           name: limit
-          description: enrich with project and/or owner
+          description: add pagination and limit to given count
           content:
             application/json:
               schema:
@@ -313,7 +323,7 @@ paths:
     patch:
       tags:
         - Tasks
-      summary: find a task
+      summary: update given task
       parameters:
         - taskId:
           name: taskId
@@ -371,7 +381,7 @@ paths:
     get:
       tags:
         - Admin
-      description: List all tasks
+      description: List all tasks as admin
       parameters:
         - in: query
           name: filter[overdue]
@@ -409,7 +419,7 @@ paths:
 
         - in: query
           name: limit
-          description: enrich with project and/or owner
+          description: add pagination and limit to given count
           content:
             application/json:
               schema:
@@ -440,7 +450,7 @@ paths:
     get:
       tags:
         - Admin
-      summary: find a task
+      summary: find a task as admin
       parameters:
         - taskId:
           name: taskId
@@ -472,7 +482,7 @@ paths:
     patch:
       tags:
         - Admin
-      summary: find a task
+      summary: update given task as admin
       parameters:
         - taskId:
           name: taskId
