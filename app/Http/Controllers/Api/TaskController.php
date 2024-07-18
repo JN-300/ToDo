@@ -30,6 +30,7 @@ class TaskController extends Controller
     {
         $tasks = Task::query()
             ->when(isset($request->filter['overdue']), fn(Builder $builder) => $builder->overdue($request->filter['overdue']))
+            ->when(isset($request->filter['projects']), fn(Builder $builder) => $builder->forProjectIds(...$request->filter['projects']))
             ->when($request->has('with'), fn(Builder $builder)  => $builder->with($request->with))
             ->forUser(Auth::user())
         ;

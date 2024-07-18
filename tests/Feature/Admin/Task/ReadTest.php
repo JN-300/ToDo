@@ -1,6 +1,6 @@
 <?php
 
-namespace Feature\Admin\Task;
+namespace Tests\Feature\Admin\Task;
 
 use App\Enums\TaskStatusEnum;
 use App\Models\Project;
