@@ -15,18 +15,35 @@ class TaskSeeder extends Seeder
      */
     public function run(): void
     {
-        // create 10 overdue
-        Task::factory(10)
+        $fixedUser = User::all()->where('email', 'user@example.de')->first();
+        $otherUser = User::all()->whereNotIn('id', $fixedUser);
+
+        // create 5 overdue tasks for fixed user
+        Task::factory(5)
             ->withRandomDeadline(endDate: '-1 second')
             ->withOneOfGivenProjects(Project::all())
-            ->withOneOfGivenOwner(User::all())
+            ->withOwner($fixedUser)
             ->create();
 
-        // create 10 overdue
+        // create 10 active tasks for fixed user
         Task::factory(20)
             ->withRandomDeadline(startDate: '+1 week')
             ->withOneOfGivenProjects(Project::all())
-            ->withOneOfGivenOwner(User::all())
+            ->withOwner($fixedUser)
+            ->create();
+
+        // create 10 overdue tasks for other user
+        Task::factory(20)
+            ->withRandomDeadline(endDate: '-1 second')
+            ->withOneOfGivenProjects(Project::all())
+            ->withOneOfGivenOwner($otherUser)
+            ->create();
+
+        // create 100 active tasks for other user
+        Task::factory(100)
+            ->withRandomDeadline(startDate: '+1 week')
+            ->withOneOfGivenProjects(Project::all())
+            ->withOneOfGivenOwner($otherUser)
             ->create();
     }
 }
